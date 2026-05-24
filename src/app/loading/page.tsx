@@ -25,6 +25,23 @@ export default function LoadingPage() {
       return;
     }
 
+    // Save result to API and update local counter
+    try {
+      const parsed = JSON.parse(result);
+      fetch("/api/result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personality_id: parsed.personalityId,
+          scores: parsed.scores || {},
+        }),
+      }).catch(() => {});
+
+      // Update local test count
+      const current = parseInt(localStorage.getItem("testCount") || "0", 10);
+      localStorage.setItem("testCount", String(current + 1));
+    } catch {}
+
     const textInterval = setInterval(() => {
       setCurrentText((prev) => (prev + 1) % loadingTexts.length);
     }, 800);

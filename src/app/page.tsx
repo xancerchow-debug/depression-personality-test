@@ -6,16 +6,33 @@ import Link from "next/link";
 
 const headline = "测测你的抑郁型人格";
 const subtitle = "你不是不快乐，你只是形成了自己的精神天气。";
+const BASE_COUNT = 12847;
 
 export default function HomePage() {
   const [showContent, setShowContent] = useState(false);
   const [typedHeadline, setTypedHeadline] = useState("");
   const [typedSubtitle, setTypedSubtitle] = useState("");
   const [showButton, setShowButton] = useState(false);
+  const [testCount, setTestCount] = useState(BASE_COUNT);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Fetch live count from API
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        const serverCount = data.totalCount || BASE_COUNT;
+        const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
+        setTestCount(serverCount + localExtra);
+      })
+      .catch(() => {
+        const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
+        setTestCount(BASE_COUNT + localExtra);
+      });
   }, []);
 
   useEffect(() => {
@@ -187,7 +204,7 @@ export default function HomePage() {
                     transition={{ delay: 0.3, duration: 0.6 }}
                     className="mt-6 text-xs text-dark-600"
                   >
-                    已有 12,847 人完成了测试
+                    已有 {testCount.toLocaleString()} 人完成了测试
                   </motion.p>
                 </motion.div>
               )}

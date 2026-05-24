@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { personalities } from "@/data/personalities";
 
+const BASE_COUNT = 12847;
+
 export async function GET() {
   try {
     if (!supabase) {
-      // Return mock data if Supabase is not configured
       return NextResponse.json({
-        totalCount: 12847,
+        totalCount: BASE_COUNT,
         distribution: personalities.map((p) => ({
           id: p.id,
           name: p.name,
-          count: Math.floor(Math.random() * 2000) + 500,
+          count: 0,
           percentage: 0,
         })),
       });
