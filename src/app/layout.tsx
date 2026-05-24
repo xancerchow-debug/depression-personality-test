@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CitySkyline from "@/components/CitySkyline";
 
 export const metadata: Metadata = {
   title: "测测你的抑郁型人格 | 你不是不快乐，你只是形成了自己的精神天气",
@@ -42,6 +43,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <CitySkyline />
         <div className="grain-overlay" />
         {children}
       </body>
