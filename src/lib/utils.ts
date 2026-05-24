@@ -100,52 +100,60 @@ function getPersonalityId(scores: Record<Dimension, number>): string {
   return dimensionToPersonality[dominant];
 }
 
+// Normalize a raw score to 0-100 using sqrt scaling for better distribution
+function norm(raw: number, maxRaw: number): number {
+  const clamped = Math.max(0, Math.min(maxRaw, raw));
+  return Math.round(Math.sqrt(clamped / maxRaw) * 100);
+}
+
 export function calculateResult(
   scores: Record<Dimension, number>
 ): TestResult {
   const personalityId = getPersonalityId(scores);
-  const maxPossible = 36 * 4;
 
-  // Calculate derived metrics with weighted formulas
-  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-  const normalizedTotal = totalScore / maxPossible;
+  // Max possible per dimension: 36 questions * 4 points = 144
+  // But in practice no dimension hits 144, realistic max ~80-100
+  // Use 90 as practical max for sqrt normalization
+  const M = 90;
 
-  // Social Energy: low when withdrawal is high, boosted by dependency
-  const socialRaw = (scores.dependency * 1.5 + scores.performance * 1.2) -
-                    (scores.withdrawal * 1.8 + scores.numbness * 0.8);
-  const socialEnergy = Math.round(
-    Math.max(8, Math.min(96, 50 + socialRaw * 3.5))
+  // 情绪敏感度 — sensitivity + collapse
+  const emotionSensitivity = norm(
+    scores.sensitivity * 1.3 + scores.collapse * 0.7, M
   );
 
-  // Clarity Index: how "together" you feel — hurt by dissociation and numbness
-  const clarityRaw = (scores.sensitivity * 0.5) -
-                     (scores.dissociation * 1.5 + scores.numbness * 1.2 + scores.overthinking * 0.6);
-  const clarityIndex = Math.round(
-    Math.max(5, Math.min(95, 55 + clarityRaw * 3))
+  // 社交电量 — high withdrawal + high performance = drained (inverted)
+  const socialRaw = scores.withdrawal * 1.2 + (M - scores.performance) * 0.8;
+  const socialBattery = 100 - norm(socialRaw, M * 1.2);
+
+  // 思维密度 — overthinking + dissociation
+  const thoughtDensity = norm(
+    scores.overthinking * 1.2 + scores.dissociation * 0.8, M
   );
 
-  // Mental Drain: cumulative exhaustion from overthinking, collapse, sensitivity
-  const drainRaw = scores.overthinking * 1.3 + scores.collapse * 1.5 +
-                   scores.sensitivity * 0.8 + scores.performance * 0.6;
-  const mentalDrain = Math.round(
-    Math.max(10, Math.min(98, drainRaw * 2.8))
+  // 情感温度 — numbness kills it, sensitivity boosts it
+  const emotionTemp = norm(
+    (M - scores.numbness) * 0.7 + scores.sensitivity * 0.6, M * 1.3
   );
 
-  // Night Owl Probability: driven by overthinking and withdrawal patterns
-  const nightRaw = scores.overthinking * 1.2 + scores.withdrawal * 0.8 +
-                   scores.dissociation * 0.6 + scores.collapse * 0.4;
-  const nightOwlProb = Math.round(
-    Math.max(12, Math.min(97, 20 + nightRaw * 3.2))
+  // 现实锚定 — dissociation and numbness both erode it (inverted)
+  const realityRaw = scores.dissociation * 1.1 + scores.numbness * 0.9;
+  const realityAnchor = 100 - norm(realityRaw, M);
+
+  // 崩溃指数 — collapse + performance(面具的代价) + dependency(关系焦虑)
+  const collapseIndex = norm(
+    scores.collapse * 1.3 + scores.performance * 0.7 + scores.dependency * 0.5, M * 1.5
   );
 
   return {
     personalityId,
     scores,
     percentage: Math.max(3, Math.min(15, PERSONALITY_PERCENTILES[personalityId] || 8)),
-    socialEnergy,
-    clarityIndex,
-    mentalDrain,
-    nightOwlProb,
+    emotionSensitivity,
+    socialBattery,
+    thoughtDensity,
+    emotionTemp,
+    realityAnchor,
+    collapseIndex,
     timestamp: Date.now(),
   };
 }

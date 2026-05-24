@@ -226,14 +226,16 @@ export default function ResultPage() {
           transition={{ delay: 1 }}
           className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-6"
         >
-          Your Metrics
+          Your Profile
         </motion.h3>
 
         <div className="glass rounded-2xl p-6">
-          <StatBar label="社交能量值" value={result.socialEnergy} delay={1200} />
-          <StatBar label="清醒指数" value={result.clarityIndex} delay={1400} />
-          <StatBar label="精神内耗值" value={result.mentalDrain} delay={1600} />
-          <StatBar label="深夜活跃概率" value={result.nightOwlProb} delay={1800} />
+          <StatBar label="情绪敏感度" value={result.emotionSensitivity} delay={1100} />
+          <StatBar label="社交电量" value={result.socialBattery} delay={1250} />
+          <StatBar label="思维密度" value={result.thoughtDensity} delay={1400} />
+          <StatBar label="情感温度" value={result.emotionTemp} delay={1550} />
+          <StatBar label="现实锚定" value={result.realityAnchor} delay={1700} />
+          <StatBar label="崩溃指数" value={result.collapseIndex} delay={1850} />
         </div>
       </div>
 

@@ -41,10 +41,12 @@ export interface TestResult {
   personalityId: string;
   scores: Record<Dimension, number>;
   percentage: number;
-  socialEnergy: number;
-  clarityIndex: number;
-  mentalDrain: number;
-  nightOwlProb: number;
+  emotionSensitivity: number;  // 情绪敏感度
+  socialBattery: number;       // 社交电量
+  thoughtDensity: number;      // 思维密度
+  emotionTemp: number;         // 情感温度
+  realityAnchor: number;       // 现实锚定
+  collapseIndex: number;       // 崩溃指数
   timestamp: number;
 }
 
