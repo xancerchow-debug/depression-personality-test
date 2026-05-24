@@ -622,30 +622,301 @@ export const questions: Question[] = [
       },
     ],
   },
+  // === 新增 12 题 (25-36) ===
   {
     id: 24,
-    text: `最后一题：\n如果你的精神状态是一个APP，\n它现在的状态是？`,
-    dimension: "collapse",
+    text: `你在便利店买东西，\n店员多找了你十块钱，你会？`,
+    dimension: "sensitivity",
     options: [
       {
         id: "a",
-        text: "运行正常，偶尔需要更新",
+        text: "马上还回去",
         scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
       },
       {
         id: "b",
-        text: "后台运行中，但已经很久没打开过了",
-        scores: { sensitivity: 1, withdrawal: 3, overthinking: 0, numbness: 3, performance: 1, dependency: 0, dissociation: 2, collapse: 1 },
+        text: "犹豫三秒，然后还回去",
+        scores: { sensitivity: 2, withdrawal: 0, overthinking: 2, numbness: 0, performance: 1, dependency: 0, dissociation: 0, collapse: 0 },
       },
       {
         id: "c",
-        text: "持续崩溃中，但自动重启了",
-        scores: { sensitivity: 2, withdrawal: 0, overthinking: 1, numbness: 1, performance: 2, dependency: 0, dissociation: 0, collapse: 4 },
+        text: "拿走，然后内疚一整天",
+        scores: { sensitivity: 3, withdrawal: 1, overthinking: 3, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 2 },
       },
       {
         id: "d",
-        text: `显示"存储空间不足"，但我不知道要清理什么`,
-        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 3, performance: 0, dependency: 0, dissociation: 2, collapse: 3 },
+        text: "拿走，然后说服自己这是宇宙欠我的",
+        scores: { sensitivity: 1, withdrawal: 0, overthinking: 1, numbness: 2, performance: 2, dependency: 0, dissociation: 2, collapse: 0 },
+      },
+    ],
+  },
+  {
+    id: 25,
+    text: `你手机里最不想让别人看到的是？`,
+    dimension: "performance",
+    options: [
+      {
+        id: "a",
+        text: "没什么不能看的",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "凌晨三点发的那些矫情动态",
+        scores: { sensitivity: 3, withdrawal: 1, overthinking: 2, numbness: 0, performance: 3, dependency: 2, dissociation: 0, collapse: 1 },
+      },
+      {
+        id: "c",
+        text: "和自己的聊天记录（对，我给自己发消息）",
+        scores: { sensitivity: 2, withdrawal: 2, overthinking: 2, numbness: 1, performance: 1, dependency: 0, dissociation: 3, collapse: 1 },
+      },
+      {
+        id: "d",
+        text: "相册里那些截了但没发出去的图",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 3, numbness: 0, performance: 3, dependency: 2, dissociation: 1, collapse: 1 },
+      },
+    ],
+  },
+  {
+    id: 26,
+    text: `你有没有那种"突然觉得身边所有人都在演戏"的时刻？`,
+    dimension: "dissociation",
+    options: [
+      {
+        id: "a",
+        text: "没有，大家都挺真实的",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "有，包括我自己",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 2, performance: 3, dependency: 0, dissociation: 4, collapse: 1 },
+      },
+      {
+        id: "c",
+        text: "我经常觉得自己在看一部关于自己的纪录片",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 2, performance: 1, dependency: 0, dissociation: 4, collapse: 2 },
+      },
+      {
+        id: "d",
+        text: "我不确定是他们在演戏，还是我在演戏",
+        scores: { sensitivity: 3, withdrawal: 1, overthinking: 3, numbness: 1, performance: 2, dependency: 0, dissociation: 3, collapse: 2 },
+      },
+    ],
+  },
+  {
+    id: 27,
+    text: `你收到一条"在吗？"的消息，\n你的第一反应是？`,
+    dimension: "overthinking",
+    options: [
+      {
+        id: "a",
+        text: `回"在"，然后等对方说事`,
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "开始想是不是我做错了什么",
+        scores: { sensitivity: 3, withdrawal: 0, overthinking: 4, numbness: 0, performance: 2, dependency: 2, dissociation: 0, collapse: 1 },
+      },
+      {
+        id: "c",
+        text: "已读不回，等我想好了再说",
+        scores: { sensitivity: 1, withdrawal: 3, overthinking: 2, numbness: 1, performance: 1, dependency: 0, dissociation: 1, collapse: 0 },
+      },
+      {
+        id: "d",
+        text: `直接回"借钱免谈"`,
+        scores: { sensitivity: 1, withdrawal: 1, overthinking: 1, numbness: 2, performance: 3, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+    ],
+  },
+  {
+    id: 28,
+    text: `你最容易被哪种话伤到？`,
+    dimension: "sensitivity",
+    options: [
+      {
+        id: "a",
+        text: "直白的批评",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 0, performance: 2, dependency: 1, dissociation: 0, collapse: 1 },
+      },
+      {
+        id: "b",
+        text: `"你想太多了"`,
+        scores: { sensitivity: 4, withdrawal: 1, overthinking: 3, numbness: 0, performance: 1, dependency: 0, dissociation: 0, collapse: 2 },
+      },
+      {
+        id: "c",
+        text: `"你怎么又这样"`,
+        scores: { sensitivity: 3, withdrawal: 2, overthinking: 2, numbness: 1, performance: 2, dependency: 1, dissociation: 0, collapse: 3 },
+      },
+      {
+        id: "d",
+        text: "沉默，什么都不说",
+        scores: { sensitivity: 3, withdrawal: 2, overthinking: 3, numbness: 2, performance: 1, dependency: 2, dissociation: 1, collapse: 2 },
+      },
+    ],
+  },
+  {
+    id: 29,
+    text: `你理想中的周末是？`,
+    dimension: "withdrawal",
+    options: [
+      {
+        id: "a",
+        text: "和朋友出去浪",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 1, dependency: 2, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "一个人待着，但发朋友圈假装在外面",
+        scores: { sensitivity: 1, withdrawal: 2, overthinking: 1, numbness: 1, performance: 4, dependency: 2, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "c",
+        text: "睡到下午，然后躺在床上到天黑",
+        scores: { sensitivity: 1, withdrawal: 3, overthinking: 0, numbness: 3, performance: 0, dependency: 0, dissociation: 2, collapse: 2 },
+      },
+      {
+        id: "d",
+        text: "计划了很多，但最后什么都没做",
+        scores: { sensitivity: 1, withdrawal: 2, overthinking: 2, numbness: 3, performance: 0, dependency: 0, dissociation: 1, collapse: 3 },
+      },
+    ],
+  },
+  {
+    id: 30,
+    text: `你有没有那种"明明很近的人，\n却觉得ta很远"的感觉？`,
+    dimension: "dependency",
+    options: [
+      {
+        id: "a",
+        text: "没有，我觉得和身边的人很近",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "有，尤其是和父母",
+        scores: { sensitivity: 2, withdrawal: 2, overthinking: 1, numbness: 1, performance: 1, dependency: 2, dissociation: 1, collapse: 2 },
+      },
+      {
+        id: "c",
+        text: "有，我觉得没有人真正了解我",
+        scores: { sensitivity: 3, withdrawal: 2, overthinking: 2, numbness: 1, performance: 2, dependency: 2, dissociation: 2, collapse: 2 },
+      },
+      {
+        id: "d",
+        text: "我已经习惯了这种距离感",
+        scores: { sensitivity: 1, withdrawal: 3, overthinking: 1, numbness: 3, performance: 0, dependency: 0, dissociation: 2, collapse: 1 },
+      },
+    ],
+  },
+  {
+    id: 31,
+    text: `你在别人眼里是什么样的人？`,
+    dimension: "performance",
+    options: [
+      {
+        id: "a",
+        text: "和真实的我差不多",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "一个开朗、好说话的人",
+        scores: { sensitivity: 1, withdrawal: 0, overthinking: 1, numbness: 1, performance: 4, dependency: 1, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "c",
+        text: "一个独立、不需要帮助的人",
+        scores: { sensitivity: 1, withdrawal: 3, overthinking: 1, numbness: 2, performance: 3, dependency: 0, dissociation: 1, collapse: 0 },
+      },
+      {
+        id: "d",
+        text: "不知道，我给每个人看到的都不一样",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 1, performance: 3, dependency: 1, dissociation: 3, collapse: 1 },
+      },
+    ],
+  },
+  {
+    id: 32,
+    text: `你最容易在什么时候想起前任？`,
+    dimension: "sensitivity",
+    options: [
+      {
+        id: "a",
+        text: "不想了，已经过去了",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "听到某首歌的时候",
+        scores: { sensitivity: 3, withdrawal: 1, overthinking: 2, numbness: 0, performance: 1, dependency: 1, dissociation: 0, collapse: 1 },
+      },
+      {
+        id: "c",
+        text: "一个人吃饭的时候",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 1, numbness: 2, performance: 0, dependency: 2, dissociation: 1, collapse: 3 },
+      },
+      {
+        id: "d",
+        text: "开心的时候，因为开心会让我想起那些不开心",
+        scores: { sensitivity: 4, withdrawal: 1, overthinking: 3, numbness: 1, performance: 0, dependency: 1, dissociation: 1, collapse: 3 },
+      },
+    ],
+  },
+  {
+    id: 33,
+    text: `你发消息之前会反复修改吗？`,
+    dimension: "overthinking",
+    options: [
+      {
+        id: "a",
+        text: "不会，想到什么发什么",
+        scores: { sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "会，特别是发给在意的人",
+        scores: { sensitivity: 2, withdrawal: 0, overthinking: 3, numbness: 0, performance: 2, dependency: 3, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "c",
+        text: `会，然后经常全部删掉只回一个"嗯"`,
+        scores: { sensitivity: 2, withdrawal: 2, overthinking: 4, numbness: 1, performance: 2, dependency: 1, dissociation: 1, collapse: 1 },
+      },
+      {
+        id: "d",
+        text: "我已经很少主动发消息了",
+        scores: { sensitivity: 2, withdrawal: 3, overthinking: 1, numbness: 2, performance: 1, dependency: 0, dissociation: 2, collapse: 1 },
+      },
+    ],
+  },
+  {
+    id: 34,
+    text: `最后一题：\n如果让你给自己写一句墓志铭，\n你会写什么？`,
+    dimension: "collapse",
+    options: [
+      {
+        id: "a",
+        text: "活过，爱过，够了",
+        scores: { sensitivity: 1, withdrawal: 0, overthinking: 0, numbness: 0, performance: 1, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "终于不用回消息了",
+        scores: { sensitivity: 1, withdrawal: 2, overthinking: 1, numbness: 2, performance: 3, dependency: 0, dissociation: 1, collapse: 2 },
+      },
+      {
+        id: "c",
+        text: "这里躺着一个看起来很正常的人",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 2, numbness: 2, performance: 4, dependency: 0, dissociation: 2, collapse: 2 },
+      },
+      {
+        id: "d",
+        text: "我想了想，好像没什么值得写的",
+        scores: { sensitivity: 2, withdrawal: 2, overthinking: 2, numbness: 4, performance: 0, dependency: 0, dissociation: 3, collapse: 3 },
       },
     ],
   },

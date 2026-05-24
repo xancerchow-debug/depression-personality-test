@@ -139,14 +139,27 @@ export default function ResultPage() {
             </span>
           </motion.div>
 
-          {/* Icon */}
+          {/* Icon — animated */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, type: "spring" }}
-            className="text-5xl mb-6"
+            className="text-5xl mb-6 inline-block"
           >
-            {personality.icon}
+            <motion.span
+              animate={{
+                y: [0, -6, 0],
+                rotate: [0, -3, 3, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="inline-block"
+            >
+              {personality.icon}
+            </motion.span>
           </motion.div>
 
           {/* Name */}
