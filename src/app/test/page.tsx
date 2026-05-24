@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { questions } from "@/data/questions";
@@ -23,44 +23,29 @@ export default function TestPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<Record<Dimension, number>>(emptyScores());
   const [isTransitioning, setIsTransitioning] = useState(false);
-  // Track selected option per question index
+  const [highlightedOption, setHighlightedOption] = useState<string | null>(null);
   const [answers, setAnswers] = useState<(string | null)[]>(
     new Array(questions.length).fill(null)
   );
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const currentQuestion = questions[currentIndex];
-  const selectedOption = answers[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
-
-  // Recalculate scores from all answers up to current index
-  const recalcScores = useCallback(
-    (ans: (string | null)[]) => {
-      const newScores = emptyScores();
-      for (let i = 0; i <= currentIndex; i++) {
-        const optId = ans[i];
-        if (!optId) continue;
-        const q = questions[i];
-        const opt = q.options.find((o) => o.id === optId);
-        if (!opt) continue;
-        for (const [dim, score] of Object.entries(opt.scores)) {
-          newScores[dim as Dimension] += score;
-        }
-      }
-      return newScores;
-    },
-    [currentIndex]
-  );
 
   const handleAnswer = useCallback(
     (optionId: string) => {
       if (isTransitioning) return;
 
+      // Highlight the selected option immediately
+      setHighlightedOption(optionId);
+
+      // Save answer
       const newAnswers = [...answers];
       newAnswers[currentIndex] = optionId;
       setAnswers(newAnswers);
 
-      // Recalculate all scores from beginning
+      // Recalculate all scores
       const newScores = emptyScores();
       for (let i = 0; i < questions.length; i++) {
         const optId = newAnswers[i];
@@ -73,21 +58,20 @@ export default function TestPage() {
       }
       setScores(newScores);
 
-      setTimeout(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          if (currentIndex < questions.length - 1) {
-            setDirection(1);
-            setCurrentIndex((prev) => prev + 1);
-            setIsTransitioning(false);
-          } else {
-            // All questions answered — calculate result
-            const result = calculateResult(newScores);
-            sessionStorage.setItem("testResult", JSON.stringify(result));
-            router.push("/loading");
-          }
-        }, 350);
-      }, 200);
+      // Transition after a short pause to show the highlight
+      setIsTransitioning(true);
+      timerRef.current = setTimeout(() => {
+        if (currentIndex < questions.length - 1) {
+          setDirection(1);
+          setCurrentIndex((prev) => prev + 1);
+          setHighlightedOption(null);
+          setIsTransitioning(false);
+        } else {
+          const result = calculateResult(newScores);
+          sessionStorage.setItem("testResult", JSON.stringify(result));
+          router.push("/loading");
+        }
+      }, 450);
     },
     [currentIndex, answers, isTransitioning, router]
   );
@@ -97,6 +81,7 @@ export default function TestPage() {
     if (currentIndex > 0) {
       setDirection(-1);
       setCurrentIndex((prev) => prev - 1);
+      setHighlightedOption(null);
     } else {
       router.push("/");
     }
@@ -107,26 +92,11 @@ export default function TestPage() {
     if (answers[currentIndex] && currentIndex < questions.length - 1) {
       setDirection(1);
       setCurrentIndex((prev) => prev + 1);
+      setHighlightedOption(null);
     }
   };
 
-  const canGoBack = currentIndex > 0;
   const canGoForward = !!answers[currentIndex] && currentIndex < questions.length - 1;
-
-  const slideVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 80 : -80,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (dir: number) => ({
-      x: dir > 0 ? -80 : 80,
-      opacity: 0,
-    }),
-  };
 
   return (
     <main className="relative min-h-screen flex flex-col">
@@ -173,17 +143,17 @@ export default function TestPage() {
           <motion.div
             key={currentIndex}
             custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, x: direction > 0 ? 60 : -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction > 0 ? -60 : 60 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="w-full max-w-lg"
           >
+            {/* Question number */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.15 }}
               className="mb-6"
             >
               <span className="text-[10px] font-mono text-dark-600 tracking-[0.3em] uppercase">
@@ -191,36 +161,47 @@ export default function TestPage() {
               </span>
             </motion.div>
 
+            {/* Question text */}
             <motion.h2
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.15 }}
+              transition={{ delay: 0.2 }}
               className="text-xl sm:text-2xl font-medium leading-relaxed text-dark-200 mb-12 whitespace-pre-line"
             >
               {currentQuestion.text}
             </motion.h2>
 
+            {/* Options */}
             <div className="space-y-3">
               {currentQuestion.options.map((option, index) => {
-                const isSelected = selectedOption === option.id;
+                const isHighlighted = highlightedOption === option.id;
+                const isFaded = highlightedOption !== null && !isHighlighted;
                 return (
                   <motion.button
                     key={option.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + index * 0.06 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{
+                      opacity: isFaded ? 0.25 : 1,
+                      y: 0,
+                      scale: isHighlighted ? 1.01 : 1,
+                    }}
+                    transition={{
+                      opacity: { duration: 0.25 },
+                      y: { delay: 0.25 + index * 0.06, duration: 0.4 },
+                      scale: { duration: 0.2 },
+                    }}
                     onClick={() => handleAnswer(option.id)}
                     disabled={isTransitioning}
-                    className={`w-full text-left px-6 py-4 rounded-xl transition-all duration-300 ${
-                      isSelected
+                    className={`w-full text-left px-6 py-4 rounded-xl transition-colors duration-200 ${
+                      isHighlighted
                         ? "glass-strong border-cold-blue/30 text-white"
                         : "glass hover:glass-strong text-dark-300 hover:text-dark-200"
-                    } ${isTransitioning && !isSelected ? "opacity-30" : ""}`}
+                    }`}
                   >
                     <div className="flex items-start gap-4">
                       <span
-                        className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono transition-all ${
-                          isSelected
+                        className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono transition-all duration-200 ${
+                          isHighlighted
                             ? "border-cold-blue bg-cold-blue/20 text-cold-light"
                             : "border-dark-700 text-dark-600"
                         }`}
@@ -239,7 +220,7 @@ export default function TestPage() {
         </AnimatePresence>
       </div>
 
-      {/* Bottom dots — question progress indicator */}
+      {/* Bottom dots */}
       <div className="fixed bottom-0 left-0 right-0 p-6">
         <div className="flex items-center justify-center gap-1.5 mb-3">
           {questions.map((_, i) => (
@@ -258,7 +239,7 @@ export default function TestPage() {
         <p className="text-center text-[11px] text-dark-700">
           {answers[currentIndex]
             ? currentIndex < questions.length - 1
-              ? "点击右箭头进入下一题"
+              ? "点击右箭头或直接选下一题"
               : "已完成所有题目"
             : "选择最接近你真实想法的选项"}
         </p>
