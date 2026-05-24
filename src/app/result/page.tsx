@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getPersonalityById } from "@/data/personalities";
 import { TestResult, PersonalityType } from "@/types";
-import { PERSONALITY_PERCENTILES } from "@/data/personalities";
+import { DISPLAY_DIMENSIONS } from "@/lib/utils";
 
 function StatBar({ label, value, delay }: { label: string; value: number; delay: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -70,7 +70,7 @@ export default function ResultPage() {
   const router = useRouter();
   const [result, setResult] = useState<TestResult | null>(null);
   const [personality, setPersonality] = useState<PersonalityType | null>(null);
-  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [secondPersonality, setSecondPersonality] = useState<PersonalityType | null>(null);
   const [copied, setCopied] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +85,8 @@ export default function ResultPage() {
       setResult(parsed);
       const p = getPersonalityById(parsed.personalityId);
       if (p) setPersonality(p);
+      const sp = getPersonalityById(parsed.secondPersonalityId);
+      if (sp) setSecondPersonality(sp);
     } catch {
       router.push("/");
     }
@@ -112,13 +114,10 @@ export default function ResultPage() {
     );
   }
 
-  const percentile = PERSONALITY_PERCENTILES[personality.id] || 10;
-
   return (
     <main className="min-h-screen pb-32" ref={resultRef}>
       {/* Hero section */}
       <div className="relative pt-16 pb-12 px-6 overflow-hidden">
-        {/* Background glow */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] opacity-20 pointer-events-none"
           style={{
@@ -127,7 +126,6 @@ export default function ResultPage() {
         />
 
         <div className="relative max-w-lg mx-auto text-center">
-          {/* Tag */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -139,7 +137,7 @@ export default function ResultPage() {
             </span>
           </motion.div>
 
-          {/* Icon — animated */}
+          {/* Icon */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -147,15 +145,8 @@ export default function ResultPage() {
             className="text-5xl mb-6 inline-block"
           >
             <motion.span
-              animate={{
-                y: [0, -6, 0],
-                rotate: [0, -3, 3, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              animate={{ y: [0, -6, 0], rotate: [0, -3, 3, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="inline-block"
             >
               {personality.icon}
@@ -172,7 +163,6 @@ export default function ResultPage() {
             <span className="text-gradient">{personality.name}</span>
           </motion.h1>
 
-          {/* Code */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -182,7 +172,6 @@ export default function ResultPage() {
             {personality.code}
           </motion.p>
 
-          {/* Tagline */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -194,7 +183,7 @@ export default function ResultPage() {
         </div>
       </div>
 
-      {/* Percentile badge */}
+      {/* Match badge — replaces fake percentile */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -202,7 +191,7 @@ export default function ResultPage() {
         className="max-w-lg mx-auto px-6 mb-10"
       >
         <div className="glass rounded-2xl p-6 text-center">
-          <p className="text-xs text-dark-600 mb-2">全球仅有</p>
+          <p className="text-xs text-dark-600 mb-2">你最接近的人格类型</p>
           <div className="flex items-baseline justify-center gap-1">
             <motion.span
               className="text-5xl font-bold text-gradient-blue"
@@ -210,15 +199,32 @@ export default function ResultPage() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
             >
-              {percentile}
+              {result.matchPercent}
             </motion.span>
             <span className="text-lg text-dark-500">%</span>
           </div>
-          <p className="text-xs text-dark-500 mt-2">的人和你属于同类人格</p>
+          <p className="text-xs text-dark-500 mt-2">契合度</p>
         </div>
+
+        {/* Second personality */}
+        {secondPersonality && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="mt-4 glass rounded-xl p-4 flex items-center gap-4"
+          >
+            <span className="text-2xl">{secondPersonality.icon}</span>
+            <div className="flex-1 text-left">
+              <p className="text-xs text-dark-500">你也有 {result.secondMatchPercent}% 的特质属于</p>
+              <p className="text-sm text-dark-300 font-medium">{secondPersonality.name}</p>
+            </div>
+            <span className="text-xs font-mono text-dark-600">{secondPersonality.code}</span>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* Stats */}
+      {/* Stats — 6 dimensions from raw scores */}
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.h3
           initial={{ opacity: 0 }}
@@ -230,12 +236,14 @@ export default function ResultPage() {
         </motion.h3>
 
         <div className="glass rounded-2xl p-6">
-          <StatBar label="情绪敏感度" value={result.emotionSensitivity} delay={1100} />
-          <StatBar label="社交电量" value={result.socialBattery} delay={1250} />
-          <StatBar label="思维密度" value={result.thoughtDensity} delay={1400} />
-          <StatBar label="情感温度" value={result.emotionTemp} delay={1550} />
-          <StatBar label="现实锚定" value={result.realityAnchor} delay={1700} />
-          <StatBar label="崩溃指数" value={result.collapseIndex} delay={1850} />
+          {DISPLAY_DIMENSIONS.map((dim, i) => (
+            <StatBar
+              key={dim.key}
+              label={dim.label}
+              value={result.metrics[dim.key]}
+              delay={1100 + i * 150}
+            />
+          ))}
         </div>
       </div>
 

@@ -164,7 +164,7 @@ export default function HomePage() {
               transition={{ delay: 1.2, duration: 0.8 }}
               className="text-sm text-dark-500 mb-12 max-w-md mx-auto"
             >
-              24道题，帮你画出自己的精神状态画像。
+              36道题，帮你画出自己的精神状态画像。
               <br />
               不是诊断，只是照镜子。
             </motion.p>

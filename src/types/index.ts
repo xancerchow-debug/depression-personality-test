@@ -39,14 +39,11 @@ export interface PersonalityType {
 
 export interface TestResult {
   personalityId: string;
+  secondPersonalityId: string;
+  matchPercent: number;
+  secondMatchPercent: number;
   scores: Record<Dimension, number>;
-  percentage: number;
-  emotionSensitivity: number;  // 情绪敏感度
-  socialBattery: number;       // 社交电量
-  thoughtDensity: number;      // 思维密度
-  emotionTemp: number;         // 情感温度
-  realityAnchor: number;       // 现实锚定
-  collapseIndex: number;       // 崩溃指数
+  metrics: Record<Dimension, number>; // 6 个维度百分比
   timestamp: number;
 }
 
