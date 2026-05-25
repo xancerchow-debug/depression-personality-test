@@ -6,23 +6,15 @@ import Link from "next/link";
 
 const headline = "测测你的互联网精神状态";
 const subtitle = "24道题，审判你的人格。";
-const BASE_COUNT = 28743;
-
 export default function HomePage() {
   const [showContent, setShowContent] = useState(false);
   const [typedHeadline, setTypedHeadline] = useState("");
   const [typedSubtitle, setTypedSubtitle] = useState("");
   const [showButton, setShowButton] = useState(false);
-  const [testCount, setTestCount] = useState(BASE_COUNT);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 500);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
-    setTestCount(BASE_COUNT + localExtra);
   }, []);
 
   useEffect(() => {
@@ -170,7 +162,7 @@ export default function HomePage() {
                     transition={{ delay: 0.3, duration: 0.6 }}
                     className="mt-6 text-xs text-dark-700"
                   >
-                    已有 <span className="text-dark-500 font-mono">{testCount.toLocaleString()}</span> 人被审判
+                    你的人格，藏在你的聊天记录里
                   </motion.p>
                 </motion.div>
               )}
