@@ -1,19 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getPersonalityById } from "@/data/personalities";
 import { TestResult, PersonalityType } from "@/types";
 import { DISPLAY_DIMENSIONS } from "@/lib/utils";
 
 function StatBar({ label, value }: { label: string; value: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    if (!isInView) return;
     let current = 0;
     const step = Math.ceil(value / 30);
     const interval = setInterval(() => {
@@ -25,14 +22,12 @@ function StatBar({ label, value }: { label: string; value: number }) {
       setDisplayValue(current);
     }, 30);
     return () => clearInterval(interval);
-  }, [isInView, value]);
+  }, [value]);
 
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="mb-5"
     >
@@ -45,8 +40,7 @@ function StatBar({ label, value }: { label: string; value: number }) {
           className="h-full rounded-full"
           style={{ background: "linear-gradient(90deg, #2d4a73, #4a6fa5, #6b8fc4)" }}
           initial={{ width: 0 }}
-          whileInView={{ width: `${value}%` }}
-          viewport={{ once: true }}
+          animate={{ width: `${value}%` }}
           transition={{ duration: 1, ease: "easeOut" }}
         />
       </div>
@@ -58,8 +52,7 @@ function InfoSection({ title, content }: { title: string; content: string }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="mb-8"
     >
@@ -190,9 +183,8 @@ export default function ResultPage() {
 
       {/* Match badge — replaces fake percentile */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="max-w-lg mx-auto px-6 mb-10"
       >
@@ -202,8 +194,7 @@ export default function ResultPage() {
             <motion.span
               className="text-5xl font-bold text-gradient-blue"
               initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
               {result.matchPercent}
@@ -217,8 +208,7 @@ export default function ResultPage() {
         {secondPersonality && (
           <motion.div
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="mt-4 glass rounded-xl p-4 flex items-center gap-4"
           >
@@ -236,8 +226,7 @@ export default function ResultPage() {
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.h3
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-6"
         >
@@ -259,8 +248,7 @@ export default function ResultPage() {
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.div
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6"
         >
@@ -278,8 +266,7 @@ export default function ResultPage() {
 
         <motion.div
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
         >
@@ -291,8 +278,7 @@ export default function ResultPage() {
 
         <motion.div
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
         >
@@ -306,8 +292,7 @@ export default function ResultPage() {
       {/* Share section */}
       <motion.div
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="max-w-lg mx-auto px-6 mt-16"
       >
