@@ -17,8 +17,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 const emptyScores = (): Record<Dimension, number> => ({
-  sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
-  performance: 0, dependency: 0, dissociation: 0, collapse: 0,
+  rumination: 0, surveillance: 0, provocation: 0, masking: 0,
+  testing: 0, avoidance: 0, isolation: 0, eruption: 0,
 });
 
 export default function TestPage() {

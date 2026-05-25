@@ -14,14 +14,14 @@ export interface Option {
 }
 
 export type Dimension =
-  | "sensitivity"
-  | "withdrawal"
-  | "overthinking"
-  | "numbness"
-  | "performance"
-  | "dependency"
-  | "dissociation"
-  | "collapse";
+  | "rumination"
+  | "surveillance"
+  | "provocation"
+  | "masking"
+  | "testing"
+  | "avoidance"
+  | "isolation"
+  | "eruption";
 
 export interface PersonalityType {
   id: string;

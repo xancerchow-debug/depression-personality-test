@@ -8,38 +8,38 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// 10 personalities × 8 dimensions
-// Some primary dimensions repeat — algorithm handles via same-primary penalty
+// 10 personalities × 8 behavioral dimensions
+// Each personality is defined by WHAT THEY DO, not how much they feel
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
 }> = {
-  "message-ruminator":   { primary: { dim: "overthinking", ideal: 82 }, secondary: { dim: "sensitivity", ideal: 55 } },
-  "midnight-scroller":   { primary: { dim: "sensitivity", ideal: 80 }, secondary: { dim: "dependency", ideal: 60 } },
-  "pretend-whatever":    { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "performance", ideal: 58 } },
-  "earphone-escape":     { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 55 } },
-  "emotion-performer":   { primary: { dim: "performance", ideal: 82 }, secondary: { dim: "sensitivity", ideal: 60 } },
-  "social-fuse":         { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "withdrawal", ideal: 58 } },
-  "chat-replay":         { primary: { dim: "overthinking", ideal: 78 }, secondary: { dim: "sensitivity", ideal: 60 } },
-  "social-stalker":      { primary: { dim: "dissociation", ideal: 82 }, secondary: { dim: "withdrawal", ideal: 55 } },
-  "relation-tester":     { primary: { dim: "performance", ideal: 75 }, secondary: { dim: "dependency", ideal: 62 } },
-  "cold-reply":          { primary: { dim: "numbness", ideal: 72 }, secondary: { dim: "performance", ideal: 58 } },
+  "message-ruminator":   { primary: { dim: "rumination", ideal: 78 }, secondary: { dim: "surveillance", ideal: 55 } },
+  "midnight-scroller":   { primary: { dim: "surveillance", ideal: 80 }, secondary: { dim: "rumination", ideal: 60 } },
+  "pretend-whatever":    { primary: { dim: "masking", ideal: 76 }, secondary: { dim: "avoidance", ideal: 58 } },
+  "earphone-escape":     { primary: { dim: "isolation", ideal: 75 }, secondary: { dim: "masking", ideal: 55 } },
+  "emotion-performer":   { primary: { dim: "provocation", ideal: 78 }, secondary: { dim: "surveillance", ideal: 60 } },
+  "social-fuse":         { primary: { dim: "eruption", ideal: 72 }, secondary: { dim: "isolation", ideal: 58 } },
+  "chat-replay":         { primary: { dim: "rumination", ideal: 75 }, secondary: { dim: "surveillance", ideal: 62 } },
+  "social-stalker":      { primary: { dim: "surveillance", ideal: 78 }, secondary: { dim: "avoidance", ideal: 55 } },
+  "relation-tester":     { primary: { dim: "testing", ideal: 76 }, secondary: { dim: "surveillance", ideal: 60 } },
+  "cold-reply":          { primary: { dim: "masking", ideal: 72 }, secondary: { dim: "testing", ideal: 58 } },
 };
 
 // Display dimensions (6 of 8)
 const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
-  { key: "sensitivity", label: "情绪敏感度" },
-  { key: "withdrawal", label: "社交回避度" },
-  { key: "overthinking", label: "思维反刍度" },
-  { key: "numbness", label: "情感钝化度" },
-  { key: "performance", label: "人格面具度" },
-  { key: "dissociation", label: "现实解离度" },
+  { key: "rumination", label: "反复回想" },
+  { key: "surveillance", label: "主动监控" },
+  { key: "provocation", label: "暗示试探" },
+  { key: "masking", label: "情绪伪装" },
+  { key: "testing", label: "关系测试" },
+  { key: "avoidance", label: "冲突回避" },
 ];
 
 // Primary-only question count per dimension
 const PRIMARY_Q_COUNT: Record<Dimension, number> = {
-  sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
-  performance: 0, dependency: 0, dissociation: 0, collapse: 0,
+  rumination: 0, surveillance: 0, provocation: 0, masking: 0,
+  testing: 0, avoidance: 0, isolation: 0, eruption: 0,
 };
 for (const q of questions) {
   PRIMARY_Q_COUNT[q.dimension]++;
@@ -51,8 +51,8 @@ function calcPrimaryScores(
   shuffledQuestions: Question[],
 ): Record<Dimension, number> {
   const result: Record<Dimension, number> = {
-    sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
-    performance: 0, dependency: 0, dissociation: 0, collapse: 0,
+    rumination: 0, surveillance: 0, provocation: 0, masking: 0,
+    testing: 0, avoidance: 0, isolation: 0, eruption: 0,
   };
   for (const q of shuffledQuestions) {
     const optId = answers[q.id];
@@ -153,15 +153,15 @@ export function calculateResult(
     matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.5));
   }
 
-  // Calculate derived metrics
+  // Derived metrics
   const nightEmotion = Math.min(100, Math.round(
-    (metrics.sensitivity * 0.5 + metrics.overthinking * 0.3 + (100 - metrics.numbness) * 0.2)
+    (metrics.rumination * 0.4 + metrics.surveillance * 0.3 + metrics.eruption * 0.3)
   ));
   const relationDependency = Math.min(100, Math.round(
-    (scores.dependency / (PRIMARY_Q_COUNT.dependency * 4 || 1)) * 100
+    (metrics.testing * 0.4 + metrics.surveillance * 0.3 + metrics.provocation * 0.3)
   ));
   const mentalFriction = Math.min(100, Math.round(
-    (metrics.overthinking * 0.5 + metrics.sensitivity * 0.3 + metrics.performance * 0.2)
+    (metrics.rumination * 0.4 + metrics.masking * 0.3 + metrics.avoidance * 0.3)
   ));
 
   let carelessFlag = false;

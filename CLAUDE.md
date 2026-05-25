@@ -20,10 +20,10 @@ Test answers are computed into scores on the test page, stored in `sessionStorag
 
 ### Core scoring engine (`src/lib/utils.ts`)
 
-- 8 dimensions: `sensitivity`, `withdrawal`, `overthinking`, `numbness`, `performance`, `dependency`, `dissociation`, `collapse`
+- 8 behavioral dimensions: `rumination`, `surveillance`, `provocation`, `masking`, `testing`, `avoidance`, `isolation`, `eruption`
 - Each question has 4 options scoring 1-4 across relevant dimensions
 - Display metrics use primary-only normalization: `raw_primary_score / (primary_question_count * 4) * 100`
-- 6 of 8 dimensions are displayed; `dependency` and `collapse` feed into personality matching only
+- 6 of 8 dimensions are displayed; `isolation` and `eruption` feed into personality matching only
 
 ### Personality matching (`src/lib/utils.ts`)
 
