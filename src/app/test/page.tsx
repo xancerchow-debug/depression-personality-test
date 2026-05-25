@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { questions } from "@/data/questions";
+import { questions, FEEDBACK_MESSAGES } from "@/data/questions";
 import { calculateResult } from "@/lib/utils";
 import { Dimension, Question } from "@/types";
 
@@ -17,14 +17,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 const emptyScores = (): Record<Dimension, number> => ({
-  sensitivity: 0,
-  withdrawal: 0,
-  overthinking: 0,
-  numbness: 0,
-  performance: 0,
-  dependency: 0,
-  dissociation: 0,
-  collapse: 0,
+  sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
+  performance: 0, dependency: 0, dissociation: 0, collapse: 0,
 });
 
 export default function TestPage() {
@@ -37,6 +31,8 @@ export default function TestPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [answers, setAnswers] = useState<Record<number, string | null>>({});
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const currentQuestion = shuffledQuestions[currentIndex];
   const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100;
@@ -49,9 +45,7 @@ export default function TestPage() {
       randomAnswers[q.id] = randomOpt.id;
       const effectiveScore = q.reverse ? (5 - randomOpt.score) : randomOpt.score;
       for (const [dim, weight] of Object.entries(randomOpt.weights)) {
-        if (weight > 0) {
-          newScores[dim as Dimension] += effectiveScore * weight;
-        }
+        if (weight > 0) newScores[dim as Dimension] += effectiveScore * weight;
       }
     }
     const result = calculateResult(newScores, randomAnswers, shuffledQuestions);
@@ -62,15 +56,13 @@ export default function TestPage() {
   const handleAnswer = useCallback(
     (optionId: string) => {
       if (isTransitioning) return;
-
       setSelectedOption(optionId);
 
-      // Save answer by questionId
       const questionId = currentQuestion.id;
       const newAnswers: Record<number, string | null> = { ...answers, [questionId]: optionId };
       setAnswers(newAnswers);
 
-      // Recalculate all scores
+      // Recalculate scores
       const newScores = emptyScores();
       for (const q of shuffledQuestions) {
         const optId = newAnswers[q.id];
@@ -79,27 +71,49 @@ export default function TestPage() {
         if (!opt) continue;
         const effectiveScore = q.reverse ? (5 - opt.score) : opt.score;
         for (const [dim, weight] of Object.entries(opt.weights)) {
-          if (weight > 0) {
-            newScores[dim as Dimension] += effectiveScore * weight;
-          }
+          if (weight > 0) newScores[dim as Dimension] += effectiveScore * weight;
         }
       }
       setScores(newScores);
 
+      // Check for feedback message
+      const answeredCount = currentIndex + 1;
+      const feedback = FEEDBACK_MESSAGES.find(f => f.after === answeredCount);
+
       setTimeout(() => {
         setIsTransitioning(true);
 
-        setTimeout(() => {
-          if (currentIndex < shuffledQuestions.length - 1) {
-            setCurrentIndex((prev) => prev + 1);
-            setSelectedOption(null);
-            setIsTransitioning(false);
-          } else {
-            const result = calculateResult(newScores, newAnswers, shuffledQuestions);
-            sessionStorage.setItem("testResult", JSON.stringify(result));
-            router.push("/loading");
-          }
-        }, 400);
+        if (feedback) {
+          // Show feedback overlay
+          setFeedbackMessage(feedback.message);
+          setShowFeedback(true);
+          setTimeout(() => {
+            setShowFeedback(false);
+            setTimeout(() => {
+              if (currentIndex < shuffledQuestions.length - 1) {
+                setCurrentIndex((prev) => prev + 1);
+                setSelectedOption(null);
+                setIsTransitioning(false);
+              } else {
+                const result = calculateResult(newScores, newAnswers, shuffledQuestions);
+                sessionStorage.setItem("testResult", JSON.stringify(result));
+                router.push("/loading");
+              }
+            }, 400);
+          }, 1800);
+        } else {
+          setTimeout(() => {
+            if (currentIndex < shuffledQuestions.length - 1) {
+              setCurrentIndex((prev) => prev + 1);
+              setSelectedOption(null);
+              setIsTransitioning(false);
+            } else {
+              const result = calculateResult(newScores, newAnswers, shuffledQuestions);
+              sessionStorage.setItem("testResult", JSON.stringify(result));
+              router.push("/loading");
+            }
+          }, 400);
+        }
       }, 300);
     },
     [currentIndex, answers, isTransitioning, router, currentQuestion, shuffledQuestions]
@@ -117,7 +131,6 @@ export default function TestPage() {
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
-
         <div className="flex items-center justify-between px-6 py-4">
           <button
             onClick={() => {
@@ -142,7 +155,7 @@ export default function TestPage() {
               onClick={handleSkip}
               className="ml-3 text-[10px] text-dark-700 hover:text-dark-400 transition-colors"
             >
-              [跳过审判]
+              [跳过]
             </button>
           </span>
           <button
@@ -180,7 +193,6 @@ export default function TestPage() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-lg"
           >
-            {/* Question number */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -188,11 +200,10 @@ export default function TestPage() {
               className="mb-6"
             >
               <span className="text-[10px] font-mono text-dark-600 tracking-[0.3em] uppercase">
-                JUDGMENT {String(currentIndex + 1).padStart(2, "0")}
+                {String(currentIndex + 1).padStart(2, "0")}
               </span>
             </motion.div>
 
-            {/* Question text */}
             <motion.h2
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -202,7 +213,6 @@ export default function TestPage() {
               {currentQuestion.text}
             </motion.h2>
 
-            {/* Options */}
             <div className="space-y-3">
               {currentQuestion.options.map((option, index) => (
                 <motion.button
@@ -228,9 +238,7 @@ export default function TestPage() {
                     >
                       {String.fromCharCode(65 + index)}
                     </span>
-                    <span className="text-sm leading-relaxed pt-0.5">
-                      {option.text}
-                    </span>
+                    <span className="text-sm leading-relaxed pt-0.5">{option.text}</span>
                   </div>
                 </motion.button>
               ))}
@@ -238,6 +246,30 @@ export default function TestPage() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Feedback overlay */}
+      <AnimatePresence>
+        {showFeedback && feedbackMessage && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center px-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.p
+              className="relative text-lg sm:text-xl text-dark-200 font-medium text-center leading-relaxed max-w-md"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {feedbackMessage}
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom dots */}
       <div className="fixed bottom-0 left-0 right-0 p-6">
@@ -258,8 +290,8 @@ export default function TestPage() {
         <p className="text-center text-[11px] text-dark-700">
           {selectedOption
             ? currentIndex < shuffledQuestions.length - 1
-              ? "点击右箭头进入下一题"
-              : "已完成所有题目"
+              ? ""
+              : ""
             : "选最扎心的那个"}
         </p>
       </div>

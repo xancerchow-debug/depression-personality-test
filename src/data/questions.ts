@@ -1,6 +1,5 @@
 import { Question, Dimension } from "@/types";
 
-// Weight helper: primary dimension = 1.0, secondary dimensions at specified weight
 function w(primary: Dimension, ...secondaries: [Dimension, number][]): Record<Dimension, number> {
   const weights: Record<Dimension, number> = {
     sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
@@ -17,70 +16,70 @@ export const questions: Question[] = [
   // ── overthinking (3) ──
   {
     id: 1,
-    text: "别人突然不回你消息时，\n你会开始反复复盘自己说错什么了吗？",
+    text: "你有没有在输入框里打了一大段话，\n反复改了三遍，\n然后全部删掉只回了一个'嗯'？",
     dimension: "overthinking",
     options: [
-      { id: "a", text: "不会，可能只是在忙吧", score: 1, weights: w("overthinking") },
-      { id: "b", text: "偶尔会想一下，但很快就放下了", score: 2, weights: w("overthinking", ["sensitivity", 0.3]) },
-      { id: "c", text: "会，脑子里已经演完一整部连续剧了", score: 3, weights: w("overthinking", ["sensitivity", 0.3]) },
-      { id: "d", text: "会，而且会翻聊天记录找自己哪里说错了", score: 4, weights: w("overthinking", ["sensitivity", 0.4]) },
+      { id: "a", text: "没有，想说什么就说什么", score: 1, weights: w("overthinking") },
+      { id: "b", text: "偶尔会犹豫一下，但最后还是会发出去", score: 2, weights: w("overthinking", ["sensitivity", 0.3]) },
+      { id: "c", text: "经常，打了很多字最后只发一个表情包", score: 3, weights: w("overthinking", ["sensitivity", 0.3]) },
+      { id: "d", text: "我的聊天记录里，输入框的内容永远比发出去的多十倍", score: 4, weights: w("overthinking", ["sensitivity", 0.4]) },
     ],
   },
   {
     id: 2,
-    text: "发完朋友圈之后，\n你会隔几分钟就看一下有没有人点赞吗？",
+    text: "别人随口说的一句话，\n你会不会在脑子里反复回放，\n想'他是不是在暗示什么'？",
     dimension: "overthinking",
     options: [
-      { id: "a", text: "发完就忘了，想起来才看一眼", score: 1, weights: w("overthinking") },
-      { id: "b", text: "会看一两次，但不会特意去刷", score: 2, weights: w("overthinking", ["dependency", 0.3]) },
-      { id: "c", text: "会反复看，没人赞就想删掉", score: 3, weights: w("overthinking", ["dependency", 0.3]) },
-      { id: "d", text: "发之前就已经在想'没人赞怎么办'了", score: 4, weights: w("overthinking", ["dependency", 0.4]) },
+      { id: "a", text: "不会，说啥就是啥", score: 1, weights: w("overthinking") },
+      { id: "b", text: "有时候会想一下，但很快就放下了", score: 2, weights: w("overthinking", ["sensitivity", 0.3]) },
+      { id: "c", text: "会，而且会想很久，越想越不对劲", score: 3, weights: w("overthinking", ["sensitivity", 0.3]) },
+      { id: "d", text: "会，一句话能影响我一整天的心情", score: 4, weights: w("overthinking", ["sensitivity", 0.4]) },
     ],
   },
   {
     id: 3,
-    text: "你有没有过这种感觉：\n一件事明明已经过去了，但你还是会反复想起当时的画面？",
+    text: "发完朋友圈之后，\n你会不会每隔几分钟就看一下\n有没有人点赞？",
     dimension: "overthinking",
     options: [
-      { id: "a", text: "很少，过去的事就让它过去吧", score: 1, weights: w("overthinking") },
-      { id: "b", text: "偶尔会想起来，但不会太影响心情", score: 2, weights: w("overthinking", ["numbness", 0.3]) },
-      { id: "c", text: "会，尤其是深夜，画面会自动回放", score: 3, weights: w("overthinking", ["sensitivity", 0.3]) },
-      { id: "d", text: "会，而且每次想起来都会重新难受一遍", score: 4, weights: w("overthinking", ["sensitivity", 0.4]) },
+      { id: "a", text: "发完就忘了", score: 1, weights: w("overthinking") },
+      { id: "b", text: "会看一两次，但不会特意去刷", score: 2, weights: w("overthinking", ["dependency", 0.3]) },
+      { id: "c", text: "会反复看，没人赞就想删掉", score: 3, weights: w("overthinking", ["dependency", 0.3]) },
+      { id: "d", text: "发之前就已经在想'没人赞怎么办'了", score: 4, weights: w("overthinking", ["dependency", 0.4]) },
     ],
   },
 
   // ── sensitivity (3) ──
   {
     id: 4,
-    text: "你有没有因为一个很小的细节，\n突然觉得特别难过？",
+    text: "你有没有因为一个很小的细节，\n突然觉得特别难过？\n比如一首歌、一句话、一个表情包？",
     dimension: "sensitivity",
     options: [
       { id: "a", text: "很少，我一般不会因为小事影响心情", score: 1, weights: w("sensitivity") },
       { id: "b", text: "偶尔会，但过一会儿就好了", score: 2, weights: w("sensitivity", ["overthinking", 0.3]) },
-      { id: "c", text: "会，有时候一首歌、一句话就能让我破防", score: 3, weights: w("sensitivity", ["collapse", 0.3]) },
+      { id: "c", text: "会，有时候一首歌就能让我破防", score: 3, weights: w("sensitivity", ["collapse", 0.3]) },
       { id: "d", text: "会，而且我会为这件小事难过很久", score: 4, weights: w("sensitivity", ["overthinking", 0.3]) },
     ],
   },
   {
     id: 5,
-    text: "看一部电影的时候，\n你会不会因为某个情节突然眼眶发酸？",
+    text: "别人突然不回你消息的时候，\n你的第一反应是什么？",
     dimension: "sensitivity",
     options: [
-      { id: "a", text: "很少，我看电影比较理性", score: 1, weights: w("sensitivity") },
-      { id: "b", text: "偶尔会，但不会真的哭", score: 2, weights: w("sensitivity", ["numbness", 0.3]) },
-      { id: "c", text: "会，尤其是那种和自己经历有点像的情节", score: 3, weights: w("sensitivity", ["collapse", 0.3]) },
-      { id: "d", text: "会，而且哭完之后情绪要很久才能平复", score: 4, weights: w("sensitivity", ["collapse", 0.4]) },
+      { id: "a", text: "可能在忙吧，无所谓", score: 1, weights: w("sensitivity") },
+      { id: "b", text: "会想一下，但不会太在意", score: 2, weights: w("sensitivity", ["overthinking", 0.3]) },
+      { id: "c", text: "会开始想自己是不是说错了什么", score: 3, weights: w("sensitivity", ["overthinking", 0.3]) },
+      { id: "d", text: "会翻聊天记录找自己哪里不对", score: 4, weights: w("sensitivity", ["overthinking", 0.4]) },
     ],
   },
   {
     id: 6,
-    text: "别人随口说的一句话，\n你会不会反复琢磨背后的意思？",
+    text: "你有没有在便利店排队的时候，\n突然觉得特别孤独？",
     dimension: "sensitivity",
     options: [
-      { id: "a", text: "不会，说啥就是啥", score: 1, weights: w("sensitivity") },
-      { id: "b", text: "有时候会想一下，但不会太在意", score: 2, weights: w("sensitivity", ["overthinking", 0.3]) },
-      { id: "c", text: "会，我会想很久'他是不是在暗示什么'", score: 3, weights: w("sensitivity", ["overthinking", 0.3]) },
-      { id: "d", text: "会，而且会影响我一整天的心情", score: 4, weights: w("sensitivity", ["overthinking", 0.4]) },
+      { id: "a", text: "没有，我在哪儿都挺自在的", score: 1, weights: w("sensitivity") },
+      { id: "b", text: "偶尔会有这种感觉，但很快就过去了", score: 2, weights: w("sensitivity", ["numbness", 0.3]) },
+      { id: "c", text: "会，尤其是在深夜", score: 3, weights: w("sensitivity", ["numbness", 0.3]) },
+      { id: "d", text: "会，而且那种感觉会持续很久", score: 4, weights: w("sensitivity", ["numbness", 0.4]) },
     ],
   },
 
@@ -144,7 +143,7 @@ export const questions: Question[] = [
   },
   {
     id: 12,
-    text: "你有没有过这种时刻：\n明明应该开心的事，但你就是开心不起来？",
+    text: "你有没有过这种时刻：\n明明应该开心的事，\n但你就是开心不起来？",
     dimension: "numbness",
     reverse: true,
     options: [
@@ -158,17 +157,6 @@ export const questions: Question[] = [
   // ── performance (3) ──
   {
     id: 13,
-    text: "当所有人都觉得你很开朗的时候，\n你真实的感受是什么？",
-    dimension: "performance",
-    options: [
-      { id: "a", text: "我就是开朗啊，没什么好装的", score: 1, weights: w("performance") },
-      { id: "b", text: "大部分时候是真的，偶尔会累", score: 2, weights: w("performance", ["numbness", 0.3]) },
-      { id: "c", text: "那是演的，其实我已经很累了", score: 3, weights: w("performance", ["numbness", 0.3]) },
-      { id: "d", text: "我已经分不清哪个是真的我了", score: 4, weights: w("performance", ["dissociation", 0.4]) },
-    ],
-  },
-  {
-    id: 14,
     text: "你在群聊里发的那些'哈哈哈'，\n有多少是真的在笑？",
     dimension: "performance",
     options: [
@@ -179,21 +167,32 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: 15,
-    text: "你有没有一个'人设'，\n是你一直在努力维护的？",
+    id: 14,
+    text: "你有没有在朋友圈发过一条伤感文案，\n配了一张风景照，\n然后设置'仅自己可见'？",
     dimension: "performance",
     options: [
-      { id: "a", text: "没有，我就是我", score: 1, weights: w("performance") },
-      { id: "b", text: "有一点，但不算太刻意", score: 2, weights: w("performance", ["withdrawal", 0.3]) },
-      { id: "c", text: "有，而且维护得很累", score: 3, weights: w("performance", ["withdrawal", 0.3]) },
-      { id: "d", text: "有，我已经忘了没有这个人设的时候我是什么样的", score: 4, weights: w("performance", ["dissociation", 0.4]) },
+      { id: "a", text: "没有，我想发就发", score: 1, weights: w("performance") },
+      { id: "b", text: "偶尔会犹豫一下，但最后还是发了", score: 2, weights: w("performance", ["withdrawal", 0.3]) },
+      { id: "c", text: "有，发了又删了", score: 3, weights: w("performance", ["withdrawal", 0.3]) },
+      { id: "d", text: "有，而且不止一次", score: 4, weights: w("performance", ["withdrawal", 0.4]) },
+    ],
+  },
+  {
+    id: 15,
+    text: "当所有人都觉得你很开朗的时候，\n你真实的感受是什么？",
+    dimension: "performance",
+    options: [
+      { id: "a", text: "我就是开朗啊，没什么好装的", score: 1, weights: w("performance") },
+      { id: "b", text: "大部分时候是真的，偶尔会累", score: 2, weights: w("performance", ["numbness", 0.3]) },
+      { id: "c", text: "那是演的，其实我已经很累了", score: 3, weights: w("performance", ["numbness", 0.3]) },
+      { id: "d", text: "我已经分不清哪个是真的我了", score: 4, weights: w("performance", ["dissociation", 0.4]) },
     ],
   },
 
   // ── dependency (3) ──
   {
     id: 16,
-    text: "你有没有那种'如果ta不回我消息我就很焦虑'的人？",
+    text: "你有没有那种'如果ta不回我消息\n我就很焦虑'的人？",
     dimension: "dependency",
     options: [
       { id: "a", text: "没有，谁不回我都无所谓", score: 1, weights: w("dependency") },
@@ -228,7 +227,7 @@ export const questions: Question[] = [
   // ── dissociation (3) ──
   {
     id: 19,
-    text: "你有没有过这种感觉：\n看着镜子里的自己，觉得有点陌生？",
+    text: "你有没有过这种感觉：\n看着镜子里的自己，\n觉得有点陌生？",
     dimension: "dissociation",
     options: [
       { id: "a", text: "没有，那就是我啊", score: 1, weights: w("dissociation") },
@@ -250,7 +249,7 @@ export const questions: Question[] = [
   },
   {
     id: 21,
-    text: "你有没有过突然'走神'的时候，\n感觉灵魂飘到了身体外面？",
+    text: "你有没有突然'走神'的时候，\n感觉灵魂飘到了身体外面？",
     dimension: "dissociation",
     options: [
       { id: "a", text: "没有，我注意力挺集中的", score: 1, weights: w("dissociation") },
@@ -295,4 +294,15 @@ export const questions: Question[] = [
       { id: "d", text: "对，我宁愿憋着也不让任何人看到我哭", score: 4, weights: w("collapse", ["performance", 0.4]) },
     ],
   },
+];
+
+// Micro-feedback shown after certain question thresholds
+export const FEEDBACK_MESSAGES: { after: number; message: string }[] = [
+  { after: 3, message: "原来你也会这样。很多人在深夜反复想这些。" },
+  { after: 6, message: "你似乎总在压抑表达。但你的沉默比语言更诚实。" },
+  { after: 9, message: "你比你表现出来的更敏感。这没什么不好。" },
+  { after: 12, message: "你好像很久没有真正感受过什么了。这不是你的错。" },
+  { after: 15, message: "你在别人面前演了太久。你还记得不演的自己吗？" },
+  { after: 18, message: "你总是在等别人先开口。但你有没有想过，对方也在等你？" },
+  { after: 21, message: "你和现实之间好像隔着一层。你已经习惯了这种距离。" },
 ];

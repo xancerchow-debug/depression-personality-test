@@ -8,27 +8,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Personality signatures: core dimensions that define each type
-// primary = the defining trait (70% weight), secondary = the supporting trait (30% weight)
+// Personality signatures for 8 types
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
 }> = {
-  "ghost-replier":       { primary: { dim: "overthinking", ideal: 75 }, secondary: { dim: "dissociation", ideal: 55 } },
-  "midnight-refresher":  { primary: { dim: "sensitivity", ideal: 78 }, secondary: { dim: "dependency", ideal: 60 } },
-  "recall-personality":  { primary: { dim: "overthinking", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
-  "pretend-ok":          { primary: { dim: "performance", ideal: 78 }, secondary: { dim: "numbness", ideal: 55 } },
-  "social-fuse":         { primary: { dim: "numbness", ideal: 75 }, secondary: { dim: "withdrawal", ideal: 60 } },
-  "sober-collapse":      { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "overthinking", ideal: 58 } },
-  "emotion-cache":       { primary: { dim: "numbness", ideal: 72 }, secondary: { dim: "withdrawal", ideal: 58 } },
-  "cyber-ghost":         { primary: { dim: "dissociation", ideal: 78 }, secondary: { dim: "withdrawal", ideal: 55 } },
-  "night-philosopher":   { primary: { dim: "overthinking", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 55 } },
-  "emotion-diet":        { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "dissociation", ideal: 55 } },
-  "low-battery":         { primary: { dim: "numbness", ideal: 70 }, secondary: { dim: "dependency", ideal: 52 } },
-  "persona-maintainer":  { primary: { dim: "performance", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
+  "message-ruminator":   { primary: { dim: "overthinking", ideal: 80 }, secondary: { dim: "sensitivity", ideal: 60 } },
+  "midnight-scroller":   { primary: { dim: "sensitivity", ideal: 82 }, secondary: { dim: "dependency", ideal: 62 } },
+  "pretend-whatever":    { primary: { dim: "performance", ideal: 78 }, secondary: { dim: "numbness", ideal: 55 } },
+  "earphone-escape":     { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 58 } },
+  "emotion-performer":   { primary: { dim: "performance", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 65 } },
+  "social-fuse":         { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "withdrawal", ideal: 60 } },
+  "convenience-store":   { primary: { dim: "withdrawal", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
+  "social-stalker":      { primary: { dim: "dissociation", ideal: 80 }, secondary: { dim: "withdrawal", ideal: 58 } },
 };
 
-// Dimensions to show as metrics (6 of 8)
+// Display dimensions (6 of 8)
 const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "sensitivity", label: "情绪敏感度" },
   { key: "withdrawal", label: "社交回避度" },
@@ -38,7 +33,7 @@ const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "dissociation", label: "现实解离度" },
 ];
 
-// Primary-only question count per dimension (for display metrics)
+// Primary-only question count per dimension
 const PRIMARY_Q_COUNT: Record<Dimension, number> = {
   sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
   performance: 0, dependency: 0, dissociation: 0, collapse: 0,
@@ -47,7 +42,7 @@ for (const q of questions) {
   PRIMARY_Q_COUNT[q.dimension]++;
 }
 
-// Compute display metrics using ONLY primary-dimension questions
+// Compute primary-only scores
 function calcPrimaryScores(
   answers: Record<number, string | null>,
   shuffledQuestions: Question[],
@@ -67,6 +62,7 @@ function calcPrimaryScores(
   return result;
 }
 
+// Match percent with strong separation
 function calcMatchPercent(
   metrics: Record<Dimension, number>,
   personalityId: string,
@@ -76,25 +72,28 @@ function calcMatchPercent(
 
   const userNorm = metrics;
 
+  // Primary match with 2.0 multiplier for strong separation
+  const primaryDiff = Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal);
   const primaryMatch = Math.max(0, Math.min(100,
-    100 - Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal) * 1.5
+    100 - primaryDiff * 2.0
   ));
 
   let secondaryMatch = 0;
   if (sig.secondary) {
+    const secondaryDiff = Math.abs(userNorm[sig.secondary.dim] - sig.secondary.ideal);
     secondaryMatch = Math.max(0, Math.min(100,
-      100 - Math.abs(userNorm[sig.secondary.dim] - sig.secondary.ideal) * 1.2
+      100 - secondaryDiff * 1.5
     ));
   }
 
-  let percent = Math.round(primaryMatch * 0.7 + secondaryMatch * 0.3);
+  let percent = Math.round(primaryMatch * 0.75 + secondaryMatch * 0.25);
 
   // Penalty: core dimension too low
-  if (userNorm[sig.primary.dim] < sig.primary.ideal * 0.5) {
-    percent = Math.round(percent * 0.6);
+  if (userNorm[sig.primary.dim] < sig.primary.ideal * 0.45) {
+    percent = Math.round(percent * 0.5);
   }
 
-  return Math.max(5, Math.min(98, percent));
+  return Math.max(5, Math.min(97, percent));
 }
 
 function detectCareless(
@@ -116,7 +115,7 @@ export function calculateResult(
   answers?: Record<number, string | null>,
   shuffledQuestions?: Question[],
 ): TestResult {
-  // Display metrics: primary-only scores (clean 0-100%)
+  // Display metrics: primary-only scores (0-100%)
   const metrics: Record<Dimension, number> = {} as Record<Dimension, number>;
   if (answers && shuffledQuestions) {
     const primaryScores = calcPrimaryScores(answers, shuffledQuestions);
@@ -131,6 +130,7 @@ export function calculateResult(
     }
   }
 
+  // Match all personalities
   const matches = personalities
     .map((p) => ({
       id: p.id,
@@ -138,12 +138,28 @@ export function calculateResult(
     }))
     .sort((a, b) => b.percent - a.percent);
 
-  // If top two share the same primary dimension, penalize the second
+  // Same-primary penalty for second match
   const topSig = PERSONALITY_SIGNATURES[matches[0].id];
   const secondSig = PERSONALITY_SIGNATURES[matches[1].id];
   if (topSig && secondSig && topSig.primary.dim === secondSig.primary.dim) {
-    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.55));
+    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.5));
   }
+
+  // Ensure third is well below second
+  if (matches[2].percent >= matches[1].percent * 0.85) {
+    matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.6));
+  }
+
+  // Calculate derived metrics
+  const nightEmotion = Math.min(100, Math.round(
+    (metrics.sensitivity * 0.5 + metrics.overthinking * 0.3 + (100 - metrics.numbness) * 0.2)
+  ));
+  const relationDependency = Math.min(100, Math.round(
+    (scores.dependency / (PRIMARY_Q_COUNT.dependency * 4 || 1)) * 100
+  ));
+  const mentalFriction = Math.min(100, Math.round(
+    (metrics.overthinking * 0.5 + metrics.sensitivity * 0.3 + metrics.performance * 0.2)
+  ));
 
   let carelessFlag = false;
   if (answers && shuffledQuestions) {
@@ -157,10 +173,15 @@ export function calculateResult(
   return {
     personalityId: matches[0].id,
     secondPersonalityId: matches[1].id,
+    thirdPersonalityId: matches[2].id,
     matchPercent: matches[0].percent,
     secondMatchPercent: matches[1].percent,
+    thirdMatchPercent: matches[2].percent,
     scores,
     metrics,
+    nightEmotion,
+    relationDependency,
+    mentalFriction,
     timestamp: Date.now(),
     carelessFlag,
   };

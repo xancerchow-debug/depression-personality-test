@@ -28,32 +28,36 @@ export interface PersonalityType {
   name: string;
   code: string;
   tagline: string;
-  description: string;
-  socialBehavior: string;
-  loveBehavior: string;
+  behavior: string[];         // 4 specific internet behaviors
   deepNeed: string;
   healedBy: string;
-  misunderstoodAs: string;
   shareText: string;
   color: string;
   icon: string;
-  dimensionInsights: Record<string, string>;
-  // Internet-viral additions
-  rarity: number;           // percentage of people with this type
-  dangerMatch: string;      // most dangerous personality to fall for
-  collapseTime: string;     // most likely time to break down
-  attackIndex: number;      // emotional attack power 1-10
-  chatDisappear: number;    // probability of ghosting in chat 0-100
-  viralHeadline: string;    // share headline for social media
+  rarity: number;
+  dangerMatch: string;
+  collapseTime: string;
+  attackIndex: number;
+  chatDisappear: number;
+  viralHeadline: string;
+  hiddenPersonality: {
+    name: string;
+    description: string;      // the contradiction/tension
+  };
 }
 
 export interface TestResult {
   personalityId: string;
   secondPersonalityId: string;
+  thirdPersonalityId: string;
   matchPercent: number;
   secondMatchPercent: number;
+  thirdMatchPercent: number;
   scores: Record<Dimension, number>;
   metrics: Record<Dimension, number>;
+  nightEmotion: number;       // 夜晚情绪指数
+  relationDependency: number; // 关系依赖指数
+  mentalFriction: number;     // 精神内耗指数
   timestamp: number;
   carelessFlag?: boolean;
 }
