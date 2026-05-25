@@ -21,17 +21,8 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((data) => {
-        const serverCount = data.totalCount || BASE_COUNT;
-        const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
-        setTestCount(serverCount + localExtra);
-      })
-      .catch(() => {
-        const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
-        setTestCount(BASE_COUNT + localExtra);
-      });
+    const localExtra = parseInt(localStorage.getItem("testCount") || "0", 10);
+    setTestCount(BASE_COUNT + localExtra);
   }, []);
 
   useEffect(() => {
