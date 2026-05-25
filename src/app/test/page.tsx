@@ -43,13 +43,18 @@ export default function TestPage() {
 
   const handleSkip = useCallback(() => {
     const newScores = emptyScores();
+    const randomAnswers: Record<number, string | null> = {};
     for (const q of shuffledQuestions) {
       const randomOpt = q.options[Math.floor(Math.random() * q.options.length)];
-      for (const [dim, score] of Object.entries(randomOpt.scores)) {
-        newScores[dim as Dimension] += score;
+      randomAnswers[q.id] = randomOpt.id;
+      const effectiveScore = q.reverse ? (5 - randomOpt.score) : randomOpt.score;
+      for (const [dim, weight] of Object.entries(randomOpt.weights)) {
+        if (weight > 0) {
+          newScores[dim as Dimension] += effectiveScore * weight;
+        }
       }
     }
-    const result = calculateResult(newScores);
+    const result = calculateResult(newScores, randomAnswers, shuffledQuestions);
     sessionStorage.setItem("testResult", JSON.stringify(result));
     router.push("/loading");
   }, [router, shuffledQuestions]);
@@ -72,8 +77,11 @@ export default function TestPage() {
         if (!optId) continue;
         const opt = q.options.find((o) => o.id === optId);
         if (!opt) continue;
-        for (const [dim, score] of Object.entries(opt.scores)) {
-          newScores[dim as Dimension] += score;
+        const effectiveScore = q.reverse ? (5 - opt.score) : opt.score;
+        for (const [dim, weight] of Object.entries(opt.weights)) {
+          if (weight > 0) {
+            newScores[dim as Dimension] += effectiveScore * weight;
+          }
         }
       }
       setScores(newScores);
@@ -87,7 +95,7 @@ export default function TestPage() {
             setSelectedOption(null);
             setIsTransitioning(false);
           } else {
-            const result = calculateResult(newScores);
+            const result = calculateResult(newScores, newAnswers, shuffledQuestions);
             sessionStorage.setItem("testResult", JSON.stringify(result));
             router.push("/loading");
           }

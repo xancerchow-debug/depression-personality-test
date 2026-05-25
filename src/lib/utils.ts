@@ -1,22 +1,14 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Dimension, TestResult } from "@/types";
+import { Dimension, TestResult, Question } from "@/types";
 import { personalities } from "@/data/personalities";
+import { questions } from "@/data/questions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 // Each personality's ideal dimension profile (0-100 scale)
-// Based on psychological archetypes:
-//   sensitivity = emotional reactivity
-//   withdrawal = social avoidance
-//   overthinking = rumination tendency
-//   numbness = emotional blunting
-//   performance = persona/mask wearing
-//   dependency = attachment anxiety
-//   dissociation = reality detachment
-//   collapse = structural fragility
 const IDEAL_PROFILES: Record<string, Record<Dimension, number>> = {
   "ruins-observer":              { sensitivity: 60, withdrawal: 40, overthinking: 30, numbness: 30, performance: 20, dependency: 15, dissociation: 70, collapse: 25 },
   "midnight-disconnect":         { sensitivity: 55, withdrawal: 25, overthinking: 65, numbness: 20, performance: 45, dependency: 70, dissociation: 15, collapse: 30 },
@@ -36,6 +28,16 @@ const IDEAL_PROFILES: Record<string, Record<Dimension, number>> = {
   "self-exile":                  { sensitivity: 30, withdrawal: 70, overthinking: 20, numbness: 50, performance: 15, dependency: 10, dissociation: 55, collapse: 15 },
 };
 
+// Per-personality dimension weights (normalized to sum=1)
+const PERSONALITY_WEIGHTS: Record<string, Record<Dimension, number>> = {};
+for (const [id, profile] of Object.entries(IDEAL_PROFILES)) {
+  const total = Object.values(profile).reduce((a, b) => a + b, 0);
+  PERSONALITY_WEIGHTS[id] = {} as Record<Dimension, number>;
+  for (const dim of Object.keys(profile) as Dimension[]) {
+    PERSONALITY_WEIGHTS[id][dim] = profile[dim] / total;
+  }
+}
+
 // Dimensions to show as metrics (6 of 8)
 const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "sensitivity", label: "情绪敏感度" },
@@ -46,60 +48,83 @@ const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "dissociation", label: "现实解离度" },
 ];
 
-// Max possible raw score per dimension (questions per dim × 4 points)
-const MAX_PER_DIM: Record<Dimension, number> = {
-  sensitivity: 24,   // 6 questions
-  withdrawal: 16,    // 4 questions
-  overthinking: 20,  // 5 questions
-  numbness: 16,      // 4 questions
-  performance: 24,   // 6 questions
-  dependency: 16,    // 4 questions
-  dissociation: 16,  // 4 questions
-  collapse: 12,      // 3 questions
+// Dynamically compute max raw score per dimension from questions data
+const MAX_RAW: Record<Dimension, number> = {
+  sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
+  performance: 0, dependency: 0, dissociation: 0, collapse: 0,
 };
+for (const q of questions) {
+  for (const dim of Object.keys(MAX_RAW) as Dimension[]) {
+    const maxWeight = Math.max(...q.options.map(o => o.weights[dim] || 0));
+    MAX_RAW[dim] += maxWeight * 4;
+  }
+}
 
 function calcMatchPercent(
   userScores: Record<Dimension, number>,
-  idealProfile: Record<Dimension, number>
+  idealProfile: Record<Dimension, number>,
+  personalityId: string,
 ): number {
-  // Convert raw scores to 0-100 scale
   const userNorm: Record<string, number> = {};
   for (const dim of Object.keys(userScores) as Dimension[]) {
-    userNorm[dim] = Math.round((userScores[dim] / MAX_PER_DIM[dim]) * 100);
+    userNorm[dim] = Math.round((userScores[dim] / MAX_RAW[dim]) * 100);
   }
 
-  // Euclidean distance in 8-dimensional space
+  const weights = PERSONALITY_WEIGHTS[personalityId];
   let sumSq = 0;
+  let maxSumSq = 0;
   for (const dim of Object.keys(idealProfile) as Dimension[]) {
     const diff = (userNorm[dim] || 0) - idealProfile[dim];
-    sumSq += diff * diff;
+    const w = weights[dim] || 0;
+    sumSq += w * diff * diff;
+    maxSumSq += w * 100 * 100;
   }
   const distance = Math.sqrt(sumSq);
-
-  // Max possible distance (worst case: all dimensions at opposite extremes)
-  // Each dimension can differ by at most 100, so max distance = sqrt(8 * 100^2) = ~283
-  const maxDistance = Math.sqrt(8 * 100 * 100);
+  const maxDistance = Math.sqrt(maxSumSq);
   const percent = Math.round((1 - distance / maxDistance) * 100);
 
   return Math.max(5, Math.min(98, percent));
 }
 
+function detectCareless(
+  answers: Record<number, string>,
+  shuffledQuestions: Question[],
+): boolean {
+  const reverseQs = shuffledQuestions.filter(q => q.reverse);
+  let count = 0;
+  for (const q of reverseQs) {
+    const optId = answers[q.id];
+    const opt = q.options.find(o => o.id === optId);
+    if (opt && opt.score === 1) count++;
+  }
+  return count >= 5;
+}
+
 export function calculateResult(
-  scores: Record<Dimension, number>
+  scores: Record<Dimension, number>,
+  answers?: Record<number, string | null>,
+  shuffledQuestions?: Question[],
 ): TestResult {
-  // Calculate metrics as simple percentages
   const metrics: Record<Dimension, number> = {} as Record<Dimension, number>;
   for (const dim of Object.keys(scores) as Dimension[]) {
-    metrics[dim] = Math.round((scores[dim] / MAX_PER_DIM[dim]) * 100);
+    metrics[dim] = Math.round((scores[dim] / MAX_RAW[dim]) * 100);
   }
 
-  // Find best and second-best personality match
   const matches = personalities
     .map((p) => ({
       id: p.id,
-      percent: calcMatchPercent(scores, IDEAL_PROFILES[p.id]),
+      percent: calcMatchPercent(scores, IDEAL_PROFILES[p.id], p.id),
     }))
     .sort((a, b) => b.percent - a.percent);
+
+  let carelessFlag = false;
+  if (answers && shuffledQuestions) {
+    const cleaned: Record<number, string> = {};
+    for (const [k, v] of Object.entries(answers)) {
+      if (v !== null) cleaned[Number(k)] = v;
+    }
+    carelessFlag = detectCareless(cleaned, shuffledQuestions);
+  }
 
   return {
     personalityId: matches[0].id,
@@ -109,6 +134,7 @@ export function calculateResult(
     scores,
     metrics,
     timestamp: Date.now(),
+    carelessFlag,
   };
 }
 

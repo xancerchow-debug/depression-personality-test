@@ -3,12 +3,14 @@ export interface Question {
   text: string;
   options: Option[];
   dimension: Dimension;
+  reverse?: boolean;
 }
 
 export interface Option {
   id: string;
   text: string;
-  scores: Record<Dimension, number>;
+  score: number;
+  weights: Record<Dimension, number>;
 }
 
 export type Dimension =
@@ -45,6 +47,7 @@ export interface TestResult {
   scores: Record<Dimension, number>;
   metrics: Record<Dimension, number>; // 6 个维度百分比
   timestamp: number;
+  carelessFlag?: boolean;
 }
 
 export interface UserRecord {
