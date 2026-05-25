@@ -177,6 +177,11 @@ body {
   90% { transform: translate(-10%, 10%); }
 }
 
+/* Hide grain overlay on result page to prevent visual discontinuity */
+body.result-page .grain-overlay {
+  display: none;
+}
+
 /* Page transition */
 .page-enter {
   animation: pageEnter 0.6s ease-out forwards;

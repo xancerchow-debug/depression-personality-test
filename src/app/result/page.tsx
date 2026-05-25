@@ -73,6 +73,11 @@ export default function ResultPage() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    document.body.classList.add("result-page");
+    return () => document.body.classList.remove("result-page");
+  }, []);
+
+  useEffect(() => {
     const stored = sessionStorage.getItem("testResult");
     if (!stored) {
       router.push("/");
@@ -115,9 +120,9 @@ export default function ResultPage() {
   return (
     <main className="min-h-screen pb-32" ref={resultRef}>
       {/* Hero section */}
-      <div className="relative pt-16 pb-12 px-6 overflow-hidden">
+      <div className="relative pt-16 pb-12 px-6">
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] opacity-20 pointer-events-none"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] opacity-20 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse, ${personality.color}33 0%, transparent 70%)`,
           }}
