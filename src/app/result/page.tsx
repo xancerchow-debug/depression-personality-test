@@ -6,7 +6,7 @@ import { getPersonalityById } from "@/data/personalities";
 import { TestResult, PersonalityType } from "@/types";
 import { DISPLAY_DIMENSIONS } from "@/lib/utils";
 
-function StatBar({ label, value }: { label: string; value: number }) {
+function StatBar({ label, value, insight }: { label: string; value: number; insight?: string }) {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
@@ -38,6 +38,11 @@ function StatBar({ label, value }: { label: string; value: number }) {
           }}
         />
       </div>
+      {insight && (
+        <p className="mt-2 text-[11px] text-dark-500 italic leading-relaxed">
+          {insight}
+        </p>
+      )}
     </div>
   );
 }
@@ -155,7 +160,12 @@ export default function ResultPage() {
         </h3>
         <div className="glass rounded-2xl p-6">
           {DISPLAY_DIMENSIONS.map((dim) => (
-            <StatBar key={dim.key} label={dim.label} value={result.metrics[dim.key]} />
+            <StatBar
+              key={dim.key}
+              label={dim.label}
+              value={result.metrics[dim.key]}
+              insight={personality.dimensionInsights?.[dim.key]}
+            />
           ))}
         </div>
       </div>

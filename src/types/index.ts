@@ -37,6 +37,7 @@ export interface PersonalityType {
   shareText: string;
   color: string;
   icon: string;
+  dimensionInsights: Record<string, string>;
 }
 
 export interface TestResult {
