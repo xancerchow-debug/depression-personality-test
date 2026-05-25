@@ -46,8 +46,17 @@ const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "dissociation", label: "现实解离度" },
 ];
 
-// Max possible raw score per dimension: 36 questions × 4 points = 144
-const MAX_RAW = 144;
+// Max possible raw score per dimension (questions per dim × 4 points)
+const MAX_PER_DIM: Record<Dimension, number> = {
+  sensitivity: 24,   // 6 questions
+  withdrawal: 16,    // 4 questions
+  overthinking: 20,  // 5 questions
+  numbness: 16,      // 4 questions
+  performance: 24,   // 6 questions
+  dependency: 16,    // 4 questions
+  dissociation: 16,  // 4 questions
+  collapse: 12,      // 3 questions
+};
 
 function calcMatchPercent(
   userScores: Record<Dimension, number>,
@@ -56,7 +65,7 @@ function calcMatchPercent(
   // Convert raw scores to 0-100 scale
   const userNorm: Record<string, number> = {};
   for (const dim of Object.keys(userScores) as Dimension[]) {
-    userNorm[dim] = Math.round((userScores[dim] / MAX_RAW) * 100);
+    userNorm[dim] = Math.round((userScores[dim] / MAX_PER_DIM[dim]) * 100);
   }
 
   // Euclidean distance in 8-dimensional space
@@ -81,7 +90,7 @@ export function calculateResult(
   // Calculate metrics as simple percentages
   const metrics: Record<Dimension, number> = {} as Record<Dimension, number>;
   for (const dim of Object.keys(scores) as Dimension[]) {
-    metrics[dim] = Math.round((scores[dim] / MAX_RAW) * 100);
+    metrics[dim] = Math.round((scores[dim] / MAX_PER_DIM[dim]) * 100);
   }
 
   // Find best and second-best personality match

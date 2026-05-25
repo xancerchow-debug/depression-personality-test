@@ -5,7 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { questions } from "@/data/questions";
 import { calculateResult } from "@/lib/utils";
-import { Dimension } from "@/types";
+import { Dimension, Question } from "@/types";
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 const emptyScores = (): Record<Dimension, number> => ({
   sensitivity: 0,
@@ -20,20 +29,21 @@ const emptyScores = (): Record<Dimension, number> => ({
 
 export default function TestPage() {
   const router = useRouter();
+  const [shuffledQuestions] = useState(() =>
+    shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) }))
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<Record<Dimension, number>>(emptyScores());
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [answers, setAnswers] = useState<(string | null)[]>(
-    new Array(questions.length).fill(null)
-  );
+  const [answers, setAnswers] = useState<Record<number, string | null>>({});
 
-  const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const currentQuestion = shuffledQuestions[currentIndex];
+  const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100;
 
   const handleSkip = useCallback(() => {
     const newScores = emptyScores();
-    for (const q of questions) {
+    for (const q of shuffledQuestions) {
       const randomOpt = q.options[Math.floor(Math.random() * q.options.length)];
       for (const [dim, score] of Object.entries(randomOpt.scores)) {
         newScores[dim as Dimension] += score;
@@ -42,7 +52,7 @@ export default function TestPage() {
     const result = calculateResult(newScores);
     sessionStorage.setItem("testResult", JSON.stringify(result));
     router.push("/loading");
-  }, [router]);
+  }, [router, shuffledQuestions]);
 
   const handleAnswer = useCallback(
     (optionId: string) => {
@@ -50,17 +60,17 @@ export default function TestPage() {
 
       setSelectedOption(optionId);
 
-      // Save answer
-      const newAnswers = [...answers];
-      newAnswers[currentIndex] = optionId;
+      // Save answer by questionId
+      const questionId = currentQuestion.id;
+      const newAnswers: Record<number, string | null> = { ...answers, [questionId]: optionId };
       setAnswers(newAnswers);
 
       // Recalculate all scores
       const newScores = emptyScores();
-      for (let i = 0; i < questions.length; i++) {
-        const optId = newAnswers[i];
+      for (const q of shuffledQuestions) {
+        const optId = newAnswers[q.id];
         if (!optId) continue;
-        const opt = questions[i].options.find((o) => o.id === optId);
+        const opt = q.options.find((o) => o.id === optId);
         if (!opt) continue;
         for (const [dim, score] of Object.entries(opt.scores)) {
           newScores[dim as Dimension] += score;
@@ -72,7 +82,7 @@ export default function TestPage() {
         setIsTransitioning(true);
 
         setTimeout(() => {
-          if (currentIndex < questions.length - 1) {
+          if (currentIndex < shuffledQuestions.length - 1) {
             setCurrentIndex((prev) => prev + 1);
             setSelectedOption(null);
             setIsTransitioning(false);
@@ -84,7 +94,7 @@ export default function TestPage() {
         }, 400);
       }, 300);
     },
-    [currentIndex, answers, isTransitioning, router]
+    [currentIndex, answers, isTransitioning, router, currentQuestion, shuffledQuestions]
   );
 
   return (
@@ -104,8 +114,9 @@ export default function TestPage() {
           <button
             onClick={() => {
               if (currentIndex > 0) {
+                const prevQ = shuffledQuestions[currentIndex - 1];
                 setCurrentIndex((prev) => prev - 1);
-                setSelectedOption(answers[currentIndex - 1]);
+                setSelectedOption(answers[prevQ.id] || null);
                 setIsTransitioning(false);
               } else {
                 router.push("/");
@@ -118,7 +129,7 @@ export default function TestPage() {
             </svg>
           </button>
           <span className="text-xs text-dark-600 font-mono tracking-wider">
-            {String(currentIndex + 1).padStart(2, "0")} / {questions.length}
+            {String(currentIndex + 1).padStart(2, "0")} / {shuffledQuestions.length}
             <button
               onClick={handleSkip}
               className="ml-3 text-[10px] text-dark-700 hover:text-dark-400 transition-colors"
@@ -128,15 +139,17 @@ export default function TestPage() {
           </span>
           <button
             onClick={() => {
-              if (answers[currentIndex] && currentIndex < questions.length - 1) {
+              const curAnswer = answers[currentQuestion.id];
+              if (curAnswer && currentIndex < shuffledQuestions.length - 1) {
+                const nextQ = shuffledQuestions[currentIndex + 1];
                 setCurrentIndex((prev) => prev + 1);
-                setSelectedOption(answers[currentIndex + 1] || null);
+                setSelectedOption(answers[nextQ.id] || null);
                 setIsTransitioning(false);
               }
             }}
-            disabled={!answers[currentIndex] || currentIndex >= questions.length - 1}
+            disabled={!answers[currentQuestion.id] || currentIndex >= shuffledQuestions.length - 1}
             className={`transition-colors ${
-              answers[currentIndex] && currentIndex < questions.length - 1
+              answers[currentQuestion.id] && currentIndex < shuffledQuestions.length - 1
                 ? "text-dark-500 hover:text-dark-300"
                 : "text-dark-800 cursor-not-allowed"
             }`}
@@ -221,13 +234,13 @@ export default function TestPage() {
       {/* Bottom dots */}
       <div className="fixed bottom-0 left-0 right-0 p-6">
         <div className="flex items-center justify-center gap-1.5 mb-3">
-          {questions.map((_, i) => (
+          {shuffledQuestions.map((q, i) => (
             <div
-              key={i}
+              key={q.id}
               className={`h-1 rounded-full transition-all duration-300 ${
                 i === currentIndex
                   ? "w-4 bg-cold-blue"
-                  : answers[i]
+                  : answers[q.id]
                   ? "w-1.5 bg-dark-600"
                   : "w-1.5 bg-dark-800"
               }`}
@@ -236,7 +249,7 @@ export default function TestPage() {
         </div>
         <p className="text-center text-[11px] text-dark-700">
           {selectedOption
-            ? currentIndex < questions.length - 1
+            ? currentIndex < shuffledQuestions.length - 1
               ? "点击右箭头进入下一题"
               : "已完成所有题目"
             : "选择最接近你真实想法的选项"}
