@@ -43,27 +43,45 @@ const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
   { key: "dissociation", label: "现实解离度" },
 ];
 
-// Normalize denominator: count primary-dimension questions × 4
-// This avoids inflating the denominator with secondary weight contributions
-const MAX_RAW: Record<Dimension, number> = {
+// Primary-only question count per dimension (for display metrics)
+const PRIMARY_Q_COUNT: Record<Dimension, number> = {
   sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
   performance: 0, dependency: 0, dissociation: 0, collapse: 0,
 };
 for (const q of questions) {
-  MAX_RAW[q.dimension] += 4; // each primary question contributes max score 4
+  PRIMARY_Q_COUNT[q.dimension]++;
+}
+
+// Compute display metrics using ONLY primary-dimension questions
+// This gives clean 0-100% values without secondary weight inflation
+function calcPrimaryScores(
+  answers: Record<number, string | null>,
+  shuffledQuestions: Question[],
+): Record<Dimension, number> {
+  const result: Record<Dimension, number> = {
+    sensitivity: 0, withdrawal: 0, overthinking: 0, numbness: 0,
+    performance: 0, dependency: 0, dissociation: 0, collapse: 0,
+  };
+  for (const q of shuffledQuestions) {
+    const optId = answers[q.id];
+    if (!optId) continue;
+    const opt = q.options.find((o) => o.id === optId);
+    if (!opt) continue;
+    const effectiveScore = q.reverse ? (5 - opt.score) : opt.score;
+    result[q.dimension] += effectiveScore;
+  }
+  return result;
 }
 
 function calcMatchPercent(
-  userScores: Record<Dimension, number>,
+  metrics: Record<Dimension, number>,
   personalityId: string,
 ): number {
   const sig = PERSONALITY_SIGNATURES[personalityId];
   if (!sig) return 0;
 
-  const userNorm: Record<string, number> = {};
-  for (const dim of Object.keys(userScores) as Dimension[]) {
-    userNorm[dim] = Math.round((userScores[dim] / MAX_RAW[dim]) * 100);
-  }
+  // Use the clean primary-only metrics (0-100) directly
+  const userNorm = metrics;
 
   const primaryMatch = Math.max(0, Math.min(100,
     100 - Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal) * 1.5
@@ -105,15 +123,26 @@ export function calculateResult(
   answers?: Record<number, string | null>,
   shuffledQuestions?: Question[],
 ): TestResult {
+  // Display metrics: primary-only scores (clean 0-100%, no secondary weight inflation)
   const metrics: Record<Dimension, number> = {} as Record<Dimension, number>;
-  for (const dim of Object.keys(scores) as Dimension[]) {
-    metrics[dim] = Math.round((scores[dim] / MAX_RAW[dim]) * 100);
+  if (answers && shuffledQuestions) {
+    const primaryScores = calcPrimaryScores(answers, shuffledQuestions);
+    for (const dim of Object.keys(primaryScores) as Dimension[]) {
+      const maxRaw = PRIMARY_Q_COUNT[dim] * 4;
+      metrics[dim] = maxRaw > 0 ? Math.min(100, Math.round((primaryScores[dim] / maxRaw) * 100)) : 0;
+    }
+  } else {
+    // Fallback: use full scores (for skip/random mode)
+    for (const dim of Object.keys(scores) as Dimension[]) {
+      const maxRaw = PRIMARY_Q_COUNT[dim] * 4;
+      metrics[dim] = maxRaw > 0 ? Math.min(100, Math.round((scores[dim] / maxRaw) * 100)) : 0;
+    }
   }
 
   const matches = personalities
     .map((p) => ({
       id: p.id,
-      percent: calcMatchPercent(scores, p.id),
+      percent: calcMatchPercent(metrics, p.id),
     }))
     .sort((a, b) => b.percent - a.percent);
 
