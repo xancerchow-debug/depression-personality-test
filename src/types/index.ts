@@ -11,6 +11,7 @@ export interface Option {
   text: string;
   score: number;
   weights: Record<Dimension, number>;
+  feedback?: string;
 }
 
 export type Dimension =

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { questions, FEEDBACK_MESSAGES } from "@/data/questions";
+import { questions } from "@/data/questions";
 import { calculateResult } from "@/lib/utils";
 import { Dimension, Question } from "@/types";
 
@@ -33,9 +33,37 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<Record<number, string | null>>({});
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentQuestion = shuffledQuestions[currentIndex];
   const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100;
+
+  const goToNext = useCallback((newScores: Record<Dimension, number>, newAnswers: Record<number, string | null>) => {
+    if (currentIndex < shuffledQuestions.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setSelectedOption(null);
+      setIsTransitioning(false);
+    } else {
+      const result = calculateResult(newScores, newAnswers, shuffledQuestions);
+      sessionStorage.setItem("testResult", JSON.stringify(result));
+      router.push("/loading");
+    }
+  }, [currentIndex, router, shuffledQuestions]);
+
+  const dismissFeedback = useCallback((newScores: Record<Dimension, number>, newAnswers: Record<number, string | null>) => {
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    setShowFeedback(false);
+    setTimeout(() => goToNext(newScores, newAnswers), 400);
+  }, [goToNext]);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    };
+  }, []);
 
   const handleAnswer = useCallback(
     (optionId: string) => {
@@ -60,47 +88,25 @@ export default function TestPage() {
       }
       setScores(newScores);
 
-      // Check for feedback message
-      const answeredCount = currentIndex + 1;
-      const feedback = FEEDBACK_MESSAGES.find(f => f.after === answeredCount);
+      // Check if selected option has feedback
+      const selectedOpt = currentQuestion.options.find(o => o.id === optionId);
 
       setTimeout(() => {
         setIsTransitioning(true);
 
-        if (feedback) {
-          // Show feedback overlay
-          setFeedbackMessage(feedback.message);
+        if (selectedOpt?.feedback) {
+          setFeedbackMessage(selectedOpt.feedback);
           setShowFeedback(true);
-          setTimeout(() => {
+          feedbackTimerRef.current = setTimeout(() => {
             setShowFeedback(false);
-            setTimeout(() => {
-              if (currentIndex < shuffledQuestions.length - 1) {
-                setCurrentIndex((prev) => prev + 1);
-                setSelectedOption(null);
-                setIsTransitioning(false);
-              } else {
-                const result = calculateResult(newScores, newAnswers, shuffledQuestions);
-                sessionStorage.setItem("testResult", JSON.stringify(result));
-                router.push("/loading");
-              }
-            }, 400);
-          }, 1800);
+            setTimeout(() => goToNext(newScores, newAnswers), 400);
+          }, 10000);
         } else {
-          setTimeout(() => {
-            if (currentIndex < shuffledQuestions.length - 1) {
-              setCurrentIndex((prev) => prev + 1);
-              setSelectedOption(null);
-              setIsTransitioning(false);
-            } else {
-              const result = calculateResult(newScores, newAnswers, shuffledQuestions);
-              sessionStorage.setItem("testResult", JSON.stringify(result));
-              router.push("/loading");
-            }
-          }, 400);
+          setTimeout(() => goToNext(newScores, newAnswers), 400);
         }
       }, 300);
     },
-    [currentIndex, answers, isTransitioning, router, currentQuestion, shuffledQuestions]
+    [currentIndex, answers, isTransitioning, currentQuestion, shuffledQuestions, goToNext]
   );
 
   return (
@@ -229,11 +235,15 @@ export default function TestPage() {
       <AnimatePresence>
         {showFeedback && feedbackMessage && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center px-8"
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8 cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
+            onClick={() => {
+              const newAnswers = { ...answers };
+              dismissFeedback(scores, newAnswers);
+            }}
           >
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <motion.p
@@ -244,6 +254,14 @@ export default function TestPage() {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               {feedbackMessage}
+            </motion.p>
+            <motion.p
+              className="relative text-[11px] text-dark-600 mt-8 tracking-wider"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              点击屏幕继续
             </motion.p>
           </motion.div>
         )}

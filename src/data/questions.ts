@@ -44,7 +44,7 @@ export const questions: Question[] = [
       { id: "a", text: "没有，想说什么就说什么", score: 1, weights: w("rumination") },
       { id: "b", text: "偶尔会犹豫一下，但最后还是会发出去", score: 2, weights: w("rumination", ["masking", 0.3]) },
       { id: "c", text: "经常，打了很多字最后只发一个表情包", score: 3, weights: w("rumination", ["masking", 0.3]) },
-      { id: "d", text: "我的聊天记录里，输入框的内容永远比发出去的多十倍", score: 4, weights: w("rumination", ["masking", 0.4]) },
+      { id: "d", text: "我的聊天记录里，输入框的内容永远比发出去的多十倍", score: 4, weights: w("rumination", ["masking", 0.4]), feedback: "你删掉的话，比你说出口的多。" },
     ],
   },
 
@@ -57,7 +57,7 @@ export const questions: Question[] = [
       { id: "a", text: "不会，我没注意过这些", score: 1, weights: w("surveillance") },
       { id: "b", text: "偶尔会注意一下", score: 2, weights: w("surveillance", ["rumination", 0.3]) },
       { id: "c", text: "会，而且会记住对方一般什么时候在线", score: 3, weights: w("surveillance", ["rumination", 0.3]) },
-      { id: "d", text: "会，我能精确说出对方每天几点上线几点下线", score: 4, weights: w("surveillance", ["rumination", 0.4]) },
+      { id: "d", text: "会，我能精确说出对方每天几点上线几点下线", score: 4, weights: w("surveillance", ["rumination", 0.4]), feedback: "你记住了一个不该记住的人的时间表。" },
     ],
   },
   {
@@ -68,7 +68,7 @@ export const questions: Question[] = [
       { id: "a", text: "没有，我刷朋友圈很随意", score: 1, weights: w("surveillance") },
       { id: "b", text: "偶尔会多看几条", score: 2, weights: w("surveillance", ["rumination", 0.3]) },
       { id: "c", text: "有，而且翻完之后还会反复看", score: 3, weights: w("surveillance", ["rumination", 0.3]) },
-      { id: "d", text: "有，我能翻到对方三年前的朋友圈", score: 4, weights: w("surveillance", ["rumination", 0.4]) },
+      { id: "d", text: "有，我能翻到对方三年前的朋友圈", score: 4, weights: w("surveillance", ["rumination", 0.4]), feedback: "你翻了那么多人的朋友圈，但你自己的朋友圈空空的。" },
     ],
   },
   {
@@ -79,7 +79,7 @@ export const questions: Question[] = [
       { id: "a", text: "发完就忘了", score: 1, weights: w("surveillance") },
       { id: "b", text: "会看一两次", score: 2, weights: w("surveillance", ["provocation", 0.3]) },
       { id: "c", text: "会反复看，特别关注某个人有没有点赞", score: 3, weights: w("surveillance", ["provocation", 0.3]) },
-      { id: "d", text: "会，而且如果那个人没点赞我会想删掉那条朋友圈", score: 4, weights: w("surveillance", ["provocation", 0.4]) },
+      { id: "d", text: "会，而且如果那个人没点赞我会想删掉那条朋友圈", score: 4, weights: w("surveillance", ["provocation", 0.4]), feedback: "你在意的不是谁点赞，而是那个人有没有点赞。" },
     ],
   },
 
@@ -92,7 +92,7 @@ export const questions: Question[] = [
       { id: "a", text: "没有，我发朋友圈就是想发", score: 1, weights: w("provocation") },
       { id: "b", text: "偶尔会想一下某个人看到会怎么想", score: 2, weights: w("provocation", ["masking", 0.3]) },
       { id: "c", text: "会，而且会设置'仅某人可见'", score: 3, weights: w("provocation", ["masking", 0.3]) },
-      { id: "d", text: "会，发完之后会反复看对方有没有反应", score: 4, weights: w("provocation", ["surveillance", 0.4]) },
+      { id: "d", text: "会，发完之后会反复看对方有没有反应", score: 4, weights: w("provocation", ["surveillance", 0.4]), feedback: "你发的每条朋友圈都是暗号，但你不确定有没有人收到。" },
     ],
   },
   {
@@ -114,7 +114,7 @@ export const questions: Question[] = [
       { id: "a", text: "没有，我转发就是觉得好", score: 1, weights: w("provocation") },
       { id: "b", text: "偶尔会想一下对方看到会怎么想", score: 2, weights: w("provocation", ["masking", 0.3]) },
       { id: "c", text: "会，而且会看对方有没有点赞或者评论", score: 3, weights: w("provocation", ["surveillance", 0.3]) },
-      { id: "d", text: "会，发完之后会反复想对方看没看到", score: 4, weights: w("provocation", ["surveillance", 0.4]) },
+      { id: "d", text: "会，发完之后会反复想对方看没看到", score: 4, weights: w("provocation", ["surveillance", 0.4]), feedback: "你转发的每首歌都是一封寄不出去的信。" },
     ],
   },
 
@@ -127,7 +127,7 @@ export const questions: Question[] = [
       { id: "a", text: "如实说，好就说好，不好就说不好", score: 1, weights: w("masking") },
       { id: "b", text: "一般都说'还行'", score: 2, weights: w("masking", ["avoidance", 0.3]) },
       { id: "c", text: "会说'挺好的'，但其实不太好", score: 3, weights: w("masking", ["avoidance", 0.3]) },
-      { id: "d", text: "说'没事'的速度比脑子转得还快", score: 4, weights: w("masking", ["avoidance", 0.4]) },
+      { id: "d", text: "说'没事'的速度比脑子转得还快", score: 4, weights: w("masking", ["avoidance", 0.4]), feedback: "你说'没事'说得太快了，连你自己都没来得及想。" },
     ],
   },
   {
@@ -138,7 +138,7 @@ export const questions: Question[] = [
       { id: "a", text: "大部分都是真的觉得好笑", score: 1, weights: w("masking") },
       { id: "b", text: "一半一半吧", score: 2, weights: w("masking", ["avoidance", 0.3]) },
       { id: "c", text: "大部分只是在配合气氛", score: 3, weights: w("masking", ["avoidance", 0.3]) },
-      { id: "d", text: "我已经分不清了，笑只是我的默认反应", score: 4, weights: w("masking", ["isolation", 0.4]) },
+      { id: "d", text: "我已经分不清了，笑只是我的默认反应", score: 4, weights: w("masking", ["isolation", 0.4]), feedback: "你发的哈哈哈里，有多少是假的你自己都数不清。" },
     ],
   },
   {
@@ -148,7 +148,7 @@ export const questions: Question[] = [
     options: [
       { id: "a", text: "会认真回复，表达感谢", score: 1, weights: w("masking") },
       { id: "b", text: "会回一个表情包", score: 2, weights: w("masking", ["avoidance", 0.3]) },
-      { id: "c", text: "会故意回得很冷，因为怕自己太热情", score: 3, weights: w("masking", ["testing", 0.3]) },
+      { id: "c", text: "会故意回得很冷，因为怕自己太热情", score: 3, weights: w("masking", ["testing", 0.3]), feedback: "你故意冷淡别人，但你比谁都怕对方真的走。" },
       { id: "d", text: "会想很久，最后只回一个'嗯'", score: 4, weights: w("masking", ["rumination", 0.4]) },
     ],
   },
@@ -162,7 +162,7 @@ export const questions: Question[] = [
       { id: "a", text: "不会，看到就回", score: 1, weights: w("testing") },
       { id: "b", text: "偶尔会等一会儿再回", score: 2, weights: w("testing", ["masking", 0.3]) },
       { id: "c", text: "会，而且会看对方有没有追着发", score: 3, weights: w("testing", ["surveillance", 0.3]) },
-      { id: "d", text: "会，这是我确认对方在乎我的方式", score: 4, weights: w("testing", ["surveillance", 0.4]) },
+      { id: "d", text: "会，这是我确认对方在乎我的方式", score: 4, weights: w("testing", ["surveillance", 0.4]), feedback: "你在等对方追上来，但你从不开口说。" },
     ],
   },
   {
@@ -184,7 +184,7 @@ export const questions: Question[] = [
       { id: "a", text: "不会，我说话很直接", score: 1, weights: w("testing") },
       { id: "b", text: "偶尔会，但不是故意的", score: 2, weights: w("testing", ["provocation", 0.3]) },
       { id: "c", text: "会，而且会看对方有没有听出来", score: 3, weights: w("testing", ["provocation", 0.3]) },
-      { id: "d", text: "会，这是我试探对方的一种方式", score: 4, weights: w("testing", ["provocation", 0.4]) },
+      { id: "d", text: "会，这是我试探对方的一种方式", score: 4, weights: w("testing", ["provocation", 0.4]), feedback: "你说反话的时候，其实希望对方能听出来。" },
     ],
   },
 
@@ -197,7 +197,7 @@ export const questions: Question[] = [
       { id: "a", text: "会直接说出来", score: 1, weights: w("avoidance") },
       { id: "b", text: "会犹豫一下，但最后还是会说", score: 2, weights: w("avoidance", ["masking", 0.3]) },
       { id: "c", text: "会忍着不说，等对方自己发现", score: 3, weights: w("avoidance", ["masking", 0.3]) },
-      { id: "d", text: "会假装没事，然后慢慢疏远", score: 4, weights: w("avoidance", ["isolation", 0.4]) },
+      { id: "d", text: "会假装没事，然后慢慢疏远", score: 4, weights: w("avoidance", ["isolation", 0.4]), feedback: "你一直在忍，但你已经忘了自己在忍什么了。" },
     ],
   },
   {
@@ -208,7 +208,7 @@ export const questions: Question[] = [
       { id: "a", text: "会直接说不想去", score: 1, weights: w("avoidance") },
       { id: "b", text: "会说'看心情'", score: 2, weights: w("avoidance", ["masking", 0.3]) },
       { id: "c", text: "会找借口说有事", score: 3, weights: w("avoidance", ["masking", 0.3]) },
-      { id: "d", text: "会答应去，但到了之后一直想走", score: 4, weights: w("avoidance", ["masking", 0.4]) },
+      { id: "d", text: "会答应去，但到了之后一直想走", score: 4, weights: w("avoidance", ["masking", 0.4]), feedback: "你嘴上答应了，但你心里已经开始想怎么逃了。" },
     ],
   },
   {
@@ -232,7 +232,7 @@ export const questions: Question[] = [
       { id: "a", text: "就在这两天", score: 1, weights: w("isolation") },
       { id: "b", text: "可能是一两周前吧", score: 2, weights: w("isolation", ["avoidance", 0.3]) },
       { id: "c", text: "想不起来了，好像都是别人先找我", score: 3, weights: w("isolation", ["avoidance", 0.3]) },
-      { id: "d", text: "我已经很久没有主动联系任何人了", score: 4, weights: w("isolation", ["avoidance", 0.4]) },
+      { id: "d", text: "我已经很久没有主动联系任何人了", score: 4, weights: w("isolation", ["avoidance", 0.4]), feedback: "你不是不想联系，你是怕对方觉得你烦。" },
     ],
   },
   {
@@ -254,7 +254,7 @@ export const questions: Question[] = [
       { id: "a", text: "积极参与，我是气氛组", score: 1, weights: w("isolation") },
       { id: "b", text: "偶尔插几句话", score: 2, weights: w("isolation", ["masking", 0.3]) },
       { id: "c", text: "大部分时间在听，不太想说话", score: 3, weights: w("isolation", ["masking", 0.3]) },
-      { id: "d", text: "找个角落玩手机，希望没人注意到我", score: 4, weights: w("isolation", ["avoidance", 0.4]) },
+      { id: "d", text: "找个角落玩手机，希望没人注意到我", score: 4, weights: w("isolation", ["avoidance", 0.4]), feedback: "你把自己藏得很深。但你一直在暗处看着某个人。" },
     ],
   },
 
@@ -293,15 +293,4 @@ export const questions: Question[] = [
       { id: "d", text: "对，我宁愿憋着也不让任何人看到我哭", score: 4, weights: w("eruption", ["masking", 0.4]) },
     ],
   },
-];
-
-// Micro-feedback shown after certain question thresholds
-export const FEEDBACK_MESSAGES: { after: number; message: string }[] = [
-  { after: 3, message: "你删掉的话，比你说出口的多。" },
-  { after: 6, message: "你翻了那么多人的朋友圈，但你自己的朋友圈空空的。" },
-  { after: 9, message: "你发的每条朋友圈都是暗号，但你不确定有没有人收到。" },
-  { after: 12, message: "你说'没事'说得太快了，连你自己都没来得及想。" },
-  { after: 15, message: "你故意冷淡别人，但你比谁都怕对方真的走。" },
-  { after: 18, message: "你一直在忍，但你已经忘了自己在忍什么了。" },
-  { after: 21, message: "你把自己藏得很深。但你一直在暗处看着某个人。" },
 ];
