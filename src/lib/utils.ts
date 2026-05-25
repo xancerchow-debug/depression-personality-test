@@ -8,35 +8,29 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Each personality's ideal dimension profile (0-100 scale)
-const IDEAL_PROFILES: Record<string, Record<Dimension, number>> = {
-  "ruins-observer":              { sensitivity: 60, withdrawal: 40, overthinking: 30, numbness: 30, performance: 20, dependency: 15, dissociation: 70, collapse: 25 },
-  "midnight-disconnect":         { sensitivity: 55, withdrawal: 25, overthinking: 65, numbness: 20, performance: 45, dependency: 70, dissociation: 15, collapse: 30 },
-  "emotional-bunker":            { sensitivity: 25, withdrawal: 75, overthinking: 20, numbness: 50, performance: 30, dependency: 10, dissociation: 35, collapse: 15 },
-  "high-sensitivity-camouflage": { sensitivity: 80, withdrawal: 20, overthinking: 40, numbness: 10, performance: 55, dependency: 50, dissociation: 10, collapse: 20 },
-  "read-no-reply-philosopher":   { sensitivity: 40, withdrawal: 35, overthinking: 80, numbness: 25, performance: 20, dependency: 15, dissociation: 50, collapse: 25 },
-  "smiling-collapse":            { sensitivity: 50, withdrawal: 10, overthinking: 25, numbness: 20, performance: 75, dependency: 30, dissociation: 15, collapse: 55 },
-  "permanent-standby":           { sensitivity: 20, withdrawal: 60, overthinking: 15, numbness: 65, performance: 15, dependency: 10, dissociation: 30, collapse: 20 },
-  "self-destruct-warning":       { sensitivity: 55, withdrawal: 20, overthinking: 40, numbness: 15, performance: 35, dependency: 30, dissociation: 10, collapse: 75 },
-  "night-owl-philosopher":       { sensitivity: 45, withdrawal: 50, overthinking: 70, numbness: 30, performance: 15, dependency: 20, dissociation: 45, collapse: 20 },
-  "cyber-ghost":                 { sensitivity: 35, withdrawal: 55, overthinking: 25, numbness: 35, performance: 50, dependency: 10, dissociation: 60, collapse: 15 },
-  "emotional-overload":          { sensitivity: 85, withdrawal: 15, overthinking: 50, numbness: 10, performance: 25, dependency: 35, dissociation: 10, collapse: 65 },
-  "void-wanderer":               { sensitivity: 15, withdrawal: 45, overthinking: 20, numbness: 70, performance: 20, dependency: 10, dissociation: 55, collapse: 10 },
-  "people-pleaser":              { sensitivity: 50, withdrawal: 10, overthinking: 35, numbness: 15, performance: 70, dependency: 75, dissociation: 10, collapse: 25 },
-  "rational-isolator":           { sensitivity: 15, withdrawal: 65, overthinking: 20, numbness: 55, performance: 25, dependency: 10, dissociation: 40, collapse: 10 },
-  "emotional-storm":             { sensitivity: 85, withdrawal: 10, overthinking: 65, numbness: 10, performance: 20, dependency: 40, dissociation: 10, collapse: 70 },
-  "self-exile":                  { sensitivity: 30, withdrawal: 70, overthinking: 20, numbness: 50, performance: 15, dependency: 10, dissociation: 55, collapse: 15 },
+// Personality signatures: core dimensions that define each type
+// primary = the defining trait (70% weight), secondary = the supporting trait (30% weight)
+const PERSONALITY_SIGNATURES: Record<string, {
+  primary: { dim: Dimension; ideal: number };
+  secondary?: { dim: Dimension; ideal: number };
+}> = {
+  "ruins-observer":              { primary: { dim: "dissociation", ideal: 90 }, secondary: { dim: "sensitivity", ideal: 70 } },
+  "midnight-disconnect":         { primary: { dim: "dependency", ideal: 85 }, secondary: { dim: "overthinking", ideal: 75 } },
+  "emotional-bunker":            { primary: { dim: "withdrawal", ideal: 90 }, secondary: { dim: "numbness", ideal: 70 } },
+  "high-sensitivity-camouflage": { primary: { dim: "sensitivity", ideal: 90 }, secondary: { dim: "performance", ideal: 65 } },
+  "read-no-reply-philosopher":   { primary: { dim: "overthinking", ideal: 90 }, secondary: { dim: "dissociation", ideal: 60 } },
+  "smiling-collapse":            { primary: { dim: "performance", ideal: 85 }, secondary: { dim: "collapse", ideal: 75 } },
+  "permanent-standby":           { primary: { dim: "numbness", ideal: 85 }, secondary: { dim: "withdrawal", ideal: 70 } },
+  "self-destruct-warning":       { primary: { dim: "collapse", ideal: 90 }, secondary: { dim: "sensitivity", ideal: 60 } },
+  "night-owl-philosopher":       { primary: { dim: "overthinking", ideal: 80 }, secondary: { dim: "withdrawal", ideal: 65 } },
+  "cyber-ghost":                 { primary: { dim: "dissociation", ideal: 80 }, secondary: { dim: "withdrawal", ideal: 65 } },
+  "void-wanderer":               { primary: { dim: "numbness", ideal: 90 }, secondary: { dim: "dissociation", ideal: 65 } },
+  "people-pleaser":              { primary: { dim: "dependency", ideal: 90 }, secondary: { dim: "performance", ideal: 80 } },
+  "rational-isolator":           { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 70 } },
+  "emotional-overload":          { primary: { dim: "sensitivity", ideal: 90 }, secondary: { dim: "collapse", ideal: 80 } },
+  "emotional-storm":             { primary: { dim: "sensitivity", ideal: 85 }, secondary: { dim: "overthinking", ideal: 70 } },
+  "self-exile":                  { primary: { dim: "withdrawal", ideal: 85 }, secondary: { dim: "dissociation", ideal: 55 } },
 };
-
-// Per-personality dimension weights (normalized to sum=1)
-const PERSONALITY_WEIGHTS: Record<string, Record<Dimension, number>> = {};
-for (const [id, profile] of Object.entries(IDEAL_PROFILES)) {
-  const total = Object.values(profile).reduce((a, b) => a + b, 0);
-  PERSONALITY_WEIGHTS[id] = {} as Record<Dimension, number>;
-  for (const dim of Object.keys(profile) as Dimension[]) {
-    PERSONALITY_WEIGHTS[id][dim] = profile[dim] / total;
-  }
-}
 
 // Dimensions to show as metrics (6 of 8)
 const DISPLAY_DIMENSIONS: { key: Dimension; label: string }[] = [
@@ -62,26 +56,33 @@ for (const q of questions) {
 
 function calcMatchPercent(
   userScores: Record<Dimension, number>,
-  idealProfile: Record<Dimension, number>,
   personalityId: string,
 ): number {
+  const sig = PERSONALITY_SIGNATURES[personalityId];
+  if (!sig) return 0;
+
   const userNorm: Record<string, number> = {};
   for (const dim of Object.keys(userScores) as Dimension[]) {
     userNorm[dim] = Math.round((userScores[dim] / MAX_RAW[dim]) * 100);
   }
 
-  const weights = PERSONALITY_WEIGHTS[personalityId];
-  let sumSq = 0;
-  let maxSumSq = 0;
-  for (const dim of Object.keys(idealProfile) as Dimension[]) {
-    const diff = (userNorm[dim] || 0) - idealProfile[dim];
-    const w = weights[dim] || 0;
-    sumSq += w * diff * diff;
-    maxSumSq += w * 100 * 100;
+  const primaryMatch = Math.max(0, Math.min(100,
+    100 - Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal) * 1.5
+  ));
+
+  let secondaryMatch = 0;
+  if (sig.secondary) {
+    secondaryMatch = Math.max(0, Math.min(100,
+      100 - Math.abs(userNorm[sig.secondary.dim] - sig.secondary.ideal) * 1.2
+    ));
   }
-  const distance = Math.sqrt(sumSq);
-  const maxDistance = Math.sqrt(maxSumSq);
-  const percent = Math.round((1 - distance / maxDistance) * 100);
+
+  let percent = Math.round(primaryMatch * 0.7 + secondaryMatch * 0.3);
+
+  // Penalty: core dimension too low
+  if (userNorm[sig.primary.dim] < sig.primary.ideal * 0.5) {
+    percent = Math.round(percent * 0.6);
+  }
 
   return Math.max(5, Math.min(98, percent));
 }
@@ -113,7 +114,7 @@ export function calculateResult(
   const matches = personalities
     .map((p) => ({
       id: p.id,
-      percent: calcMatchPercent(scores, IDEAL_PROFILES[p.id], p.id),
+      percent: calcMatchPercent(scores, p.id),
     }))
     .sort((a, b) => b.percent - a.percent);
 

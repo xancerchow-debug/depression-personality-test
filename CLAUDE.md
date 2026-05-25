@@ -29,10 +29,11 @@ Test answers are computed into scores on the test page, stored in `sessionStorag
 ### Personality matching (`src/lib/utils.ts`)
 
 - 16 personality types defined in `src/data/personalities.ts`
-- Each has an `IDEAL_PROFILES` entry — an 8-dimensional vector (0-100 scale)
-- Matching uses Euclidean distance in 8D space between normalized user scores and each ideal profile
+- Each personality has a signature: primary dimension (70% weight) + secondary dimension (30% weight) with ideal values
+- Match = `primaryMatch * 0.7 + secondaryMatch * 0.3` where match = `clamp(100 - |userNorm - ideal| * multiplier, 0, 100)`
+- Penalty if core dimension is below half the ideal threshold
 - Returns best match (primary) + second best match with match percentages
-- Match percent = `(1 - distance / maxDistance) × 100`, clamped to [5, 98]
+- Match percent clamped to [5, 98]
 
 ### Data files
 
