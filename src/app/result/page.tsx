@@ -1,36 +1,39 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getPersonalityById } from "@/data/personalities";
 import { TestResult, PersonalityType } from "@/types";
 import { DISPLAY_DIMENSIONS } from "@/lib/utils";
 
-function StatBar({ label, value, delay }: { label: string; value: number; delay: number }) {
+function StatBar({ label, value }: { label: string; value: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true });
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      let current = 0;
-      const step = Math.ceil(value / 30);
-      const interval = setInterval(() => {
-        current += step;
-        if (current >= value) {
-          current = value;
-          clearInterval(interval);
-        }
-        setDisplayValue(current);
-      }, 30);
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
+    if (!isInView) return;
+    let current = 0;
+    const step = Math.ceil(value / 30);
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= value) {
+        current = value;
+        clearInterval(interval);
+      }
+      setDisplayValue(current);
+    }, 30);
+    return () => clearInterval(interval);
+  }, [isInView, value]);
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: delay / 1000, duration: 0.5 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       className="mb-5"
     >
       <div className="flex justify-between items-center mb-2">
@@ -42,20 +45,22 @@ function StatBar({ label, value, delay }: { label: string; value: number; delay:
           className="h-full rounded-full"
           style={{ background: "linear-gradient(90deg, #2d4a73, #4a6fa5, #6b8fc4)" }}
           initial={{ width: 0 }}
-          animate={{ width: `${value}%` }}
-          transition={{ delay: delay / 1000, duration: 1, ease: "easeOut" }}
+          whileInView={{ width: `${value}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeOut" }}
         />
       </div>
     </motion.div>
   );
 }
 
-function InfoSection({ title, content, delay }: { title: string; content: string; delay: number }) {
+function InfoSection({ title, content }: { title: string; content: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.6 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       className="mb-8"
     >
       <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
@@ -129,7 +134,7 @@ export default function ResultPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.5 }}
             className="mb-6"
           >
             <span className="inline-block px-4 py-1.5 text-[10px] tracking-[0.3em] uppercase text-dark-500 border border-dark-800 rounded-full">
@@ -141,7 +146,7 @@ export default function ResultPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, type: "spring" }}
+            transition={{ type: "spring" }}
             className="text-5xl mb-6 inline-block"
           >
             <motion.span
@@ -157,7 +162,7 @@ export default function ResultPage() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ duration: 0.5 }}
             className="text-3xl sm:text-4xl font-bold mb-2"
           >
             <span className="text-gradient">{personality.name}</span>
@@ -166,7 +171,7 @@ export default function ResultPage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="text-xs font-mono text-dark-600 tracking-[0.3em] mb-4"
           >
             {personality.code}
@@ -175,7 +180,7 @@ export default function ResultPage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ duration: 0.5 }}
             className="text-base text-dark-400 italic"
           >
             &ldquo;{personality.tagline}&rdquo;
@@ -186,8 +191,9 @@ export default function ResultPage() {
       {/* Match badge — replaces fake percentile */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
         className="max-w-lg mx-auto px-6 mb-10"
       >
         <div className="glass rounded-2xl p-6 text-center">
@@ -196,8 +202,9 @@ export default function ResultPage() {
             <motion.span
               className="text-5xl font-bold text-gradient-blue"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
             >
               {result.matchPercent}
             </motion.span>
@@ -210,8 +217,9 @@ export default function ResultPage() {
         {secondPersonality && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             className="mt-4 glass rounded-xl p-4 flex items-center gap-4"
           >
             <span className="text-2xl">{secondPersonality.icon}</span>
@@ -228,20 +236,20 @@ export default function ResultPage() {
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.h3
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-6"
         >
           Your Profile
         </motion.h3>
 
         <div className="glass rounded-2xl p-6">
-          {DISPLAY_DIMENSIONS.map((dim, i) => (
+          {DISPLAY_DIMENSIONS.map((dim) => (
             <StatBar
               key={dim.key}
               label={dim.label}
               value={result.metrics[dim.key]}
-              delay={1100 + i * 150}
             />
           ))}
         </div>
@@ -250,9 +258,10 @@ export default function ResultPage() {
       {/* Description */}
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6"
         >
           <p className="text-sm text-dark-300 leading-[1.8]">
@@ -263,14 +272,15 @@ export default function ResultPage() {
 
       {/* Detail sections */}
       <div className="max-w-lg mx-auto px-6">
-        <InfoSection title="社交表现" content={personality.socialBehavior} delay={1.4} />
-        <InfoSection title="恋爱表现" content={personality.loveBehavior} delay={1.5} />
-        <InfoSection title="深层心理需求" content={personality.deepNeed} delay={1.6} />
+        <InfoSection title="社交表现" content={personality.socialBehavior} />
+        <InfoSection title="恋爱表现" content={personality.loveBehavior} />
+        <InfoSection title="深层心理需求" content={personality.deepNeed} />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.7 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
         >
           <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
@@ -281,8 +291,9 @@ export default function ResultPage() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
         >
           <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
@@ -294,9 +305,10 @@ export default function ResultPage() {
 
       {/* Share section */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
         className="max-w-lg mx-auto px-6 mt-16"
       >
         <div className="text-center mb-8">

@@ -895,7 +895,7 @@ export const questions: Question[] = [
   },
   {
     id: 34,
-    text: `最后一题：\n如果让你给自己写一句墓志铭，\n你会写什么？`,
+    text: `如果让你给自己写一句墓志铭，\n你会写什么？`,
     dimension: "collapse",
     options: [
       {
@@ -917,6 +917,60 @@ export const questions: Question[] = [
         id: "d",
         text: "我想了想，好像没什么值得写的",
         scores: { sensitivity: 2, withdrawal: 2, overthinking: 2, numbness: 4, performance: 0, dependency: 0, dissociation: 3, collapse: 3 },
+      },
+    ],
+  },
+  {
+    id: 35,
+    text: `朋友连续几天没找你聊天，\n你会？`,
+    dimension: "dependency",
+    options: [
+      {
+        id: "a",
+        text: "没注意到，我也没找他们",
+        scores: { sensitivity: 0, withdrawal: 2, overthinking: 0, numbness: 1, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "主动发一条消息试探一下",
+        scores: { sensitivity: 2, withdrawal: 0, overthinking: 2, numbness: 0, performance: 1, dependency: 3, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "c",
+        text: "开始想是不是我做错了什么",
+        scores: { sensitivity: 2, withdrawal: 0, overthinking: 3, numbness: 0, performance: 1, dependency: 4, dissociation: 0, collapse: 1 },
+      },
+      {
+        id: "d",
+        text: "等他们来找我，我绝不先开口",
+        scores: { sensitivity: 1, withdrawal: 3, overthinking: 1, numbness: 1, performance: 2, dependency: 1, dissociation: 0, collapse: 0 },
+      },
+    ],
+  },
+  {
+    id: 36,
+    text: `你上一次感到"心动"是什么时候？`,
+    dimension: "numbness",
+    options: [
+      {
+        id: "a",
+        text: "最近，看到一个很好看的人",
+        scores: { sensitivity: 1, withdrawal: 0, overthinking: 0, numbness: 0, performance: 0, dependency: 0, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "b",
+        text: "不记得了，但我记得心动的感觉",
+        scores: { sensitivity: 2, withdrawal: 1, overthinking: 1, numbness: 2, performance: 0, dependency: 1, dissociation: 0, collapse: 0 },
+      },
+      {
+        id: "c",
+        text: "心动？我连心痛都快感觉不到了",
+        scores: { sensitivity: 1, withdrawal: 1, overthinking: 1, numbness: 4, performance: 0, dependency: 0, dissociation: 2, collapse: 2 },
+      },
+      {
+        id: "d",
+        text: "我只对食物心动过",
+        scores: { sensitivity: 0, withdrawal: 1, overthinking: 0, numbness: 3, performance: 1, dependency: 0, dissociation: 0, collapse: 0 },
       },
     ],
   },
