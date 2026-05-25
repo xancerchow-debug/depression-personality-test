@@ -8,19 +8,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Personality signatures for 8 types
+// 8 personalities × 8 dimensions, each primary dimension UNIQUE
+// Ideal values spread 65-85 for maximum separation
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
 }> = {
-  "message-ruminator":   { primary: { dim: "overthinking", ideal: 80 }, secondary: { dim: "sensitivity", ideal: 60 } },
-  "midnight-scroller":   { primary: { dim: "sensitivity", ideal: 82 }, secondary: { dim: "dependency", ideal: 62 } },
-  "pretend-whatever":    { primary: { dim: "performance", ideal: 78 }, secondary: { dim: "numbness", ideal: 55 } },
-  "earphone-escape":     { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 58 } },
-  "emotion-performer":   { primary: { dim: "performance", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 65 } },
-  "social-fuse":         { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "withdrawal", ideal: 60 } },
-  "convenience-store":   { primary: { dim: "withdrawal", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
-  "social-stalker":      { primary: { dim: "dissociation", ideal: 80 }, secondary: { dim: "withdrawal", ideal: 58 } },
+  "message-ruminator":   { primary: { dim: "overthinking", ideal: 82 }, secondary: { dim: "sensitivity", ideal: 55 } },
+  "midnight-scroller":   { primary: { dim: "sensitivity", ideal: 80 }, secondary: { dim: "dependency", ideal: 60 } },
+  "pretend-whatever":    { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "performance", ideal: 58 } },
+  "earphone-escape":     { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 55 } },
+  "emotion-performer":   { primary: { dim: "performance", ideal: 82 }, secondary: { dim: "sensitivity", ideal: 60 } },
+  "social-fuse":         { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "withdrawal", ideal: 58 } },
+  "convenience-store":   { primary: { dim: "dependency", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 62 } },
+  "social-stalker":      { primary: { dim: "dissociation", ideal: 82 }, secondary: { dim: "withdrawal", ideal: 55 } },
 };
 
 // Display dimensions (6 of 8)
@@ -62,7 +63,7 @@ function calcPrimaryScores(
   return result;
 }
 
-// Match percent with strong separation
+// Match percent: high multiplier + unique primaries = big gaps
 function calcMatchPercent(
   metrics: Record<Dimension, number>,
   personalityId: string,
@@ -72,10 +73,10 @@ function calcMatchPercent(
 
   const userNorm = metrics;
 
-  // Primary match with 2.0 multiplier for strong separation
+  // Primary: 2.5x multiplier for strong separation
   const primaryDiff = Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal);
   const primaryMatch = Math.max(0, Math.min(100,
-    100 - primaryDiff * 2.0
+    100 - primaryDiff * 2.5
   ));
 
   let secondaryMatch = 0;
@@ -88,9 +89,9 @@ function calcMatchPercent(
 
   let percent = Math.round(primaryMatch * 0.75 + secondaryMatch * 0.25);
 
-  // Penalty: core dimension too low
+  // Penalty: core dimension too low (below 45% of ideal)
   if (userNorm[sig.primary.dim] < sig.primary.ideal * 0.45) {
-    percent = Math.round(percent * 0.5);
+    percent = Math.round(percent * 0.45);
   }
 
   return Math.max(5, Math.min(97, percent));
@@ -142,12 +143,12 @@ export function calculateResult(
   const topSig = PERSONALITY_SIGNATURES[matches[0].id];
   const secondSig = PERSONALITY_SIGNATURES[matches[1].id];
   if (topSig && secondSig && topSig.primary.dim === secondSig.primary.dim) {
-    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.5));
+    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.45));
   }
 
-  // Ensure third is well below second
-  if (matches[2].percent >= matches[1].percent * 0.85) {
-    matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.6));
+  // Third must be well below second
+  if (matches[2].percent >= matches[1].percent * 0.8) {
+    matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.55));
   }
 
   // Calculate derived metrics

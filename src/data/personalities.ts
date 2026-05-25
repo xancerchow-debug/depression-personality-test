@@ -7,13 +7,13 @@ export const personalities: PersonalityType[] = [
     code: "M.R.",
     tagline: "你删掉的话，比你发出去的多十倍。",
     behavior: [
-      "打了一大段话，反复修改，全部删掉，最后只回一个'嗯'",
+      "打了一大段话，反复改了三遍，全部删掉，最后只回一个'嗯'",
       "发朋友圈之前预演了所有可能的评论，然后选择不发",
       "别人随口说的一句话你能想三天，然后假装什么都没发生",
       "聊天记录里输入框的内容永远比发出去的多十倍",
     ],
-    deepNeed: "有人对你说'你打的字我都想看'。",
-    healedBy: "一个在你沉默的时候不会追问，只是安静等你准备好的人。",
+    deepNeed: "有人对你说'你打的字我都想看，不用删'。",
+    healedBy: "一个在你已读不回的时候不会追问的人。一个知道你在想，只是还没想好的人。",
     shareText: "我测出来是「消息内耗型」——我删掉的话，比发出去的多十倍。",
     color: "#6366f1",
     icon: "✍️",
@@ -25,7 +25,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你删掉的话，比你发出去的多十倍。每一条都是一场你输了的内心战争。",
     hiddenPersonality: {
       name: "假装无所谓型",
-      description: "你的沉默不是冷漠，是一种扭曲的在乎。你删掉的每一句话，都比发出去的更真实。",
+      description: "你删掉的每一句话都比发出去的更真实。你以为沉默是保护自己，其实沉默正在吃掉你。",
     },
   },
   {
@@ -52,7 +52,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你对那个人的关注，比你表现出来的多一百倍。但你永远不主动联系。",
     hiddenPersonality: {
       name: "消息撤回型",
-      description: "你在凌晨反复查看对方的朋友圈，记住每一个细节。但你从不主动联系。",
+      description: "你翻了对方三年的朋友圈，记住了每一条。但你连一条'在吗'都不敢发。你的关注是一种无声的告白。",
     },
   },
   {
@@ -79,7 +79,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你嘴上说不在乎，但你比谁都在乎。你的无所谓是一种防御机制。",
     hiddenPersonality: {
       name: "情绪内耗型",
-      description: "你假装无所谓，但你比谁都在乎。你的无所谓是一种防御机制——在乎太多次被伤之后，你学会了先一步不在乎。",
+      description: "你嘴上说不在乎，但你比谁都在乎。你已经演了太久'没事'，连自己都快信了。但深夜你骗不了自己。",
     },
   },
   {
@@ -106,7 +106,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你能用一首歌的时间完成一次情绪崩溃和修复。你的歌单就是你的情绪日记。",
     hiddenPersonality: {
       name: "社交断电型",
-      description: "你在人群中戴耳机，不是为了听歌，是为了不被搭话。但摘下耳机的那一刻，你会觉得自己好像被暴露了。",
+      description: "你在人群中戴耳机不是为了听歌，是为了不被搭话。但摘下耳机的那一刻，你会觉得自己被暴露了。音乐是你的盔甲。",
     },
   },
   {
@@ -133,7 +133,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你的每条朋友圈都是暗号。你不是在发动态，你是在发射信号。",
     hiddenPersonality: {
       name: "耳机逃生型",
-      description: "你用表演来靠近别人，但真正被靠近的时候，你又想戴起耳机逃走。",
+      description: "你用表演来靠近别人，但真正被靠近的时候，你又想戴起耳机逃走。你渴望被发现，又害怕被看穿。",
     },
   },
   {
@@ -160,23 +160,23 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你的社交电量只够维持'正常'这个表象。多一点都不行。",
     hiddenPersonality: {
       name: "假装无所谓型",
-      description: "你不是不在乎，你是真的没电了。但你断电的时候看起来就像不在乎。这是你最大的误解。",
+      description: "你不是不在乎，你是真的没电了。但你断电的时候看起来就像不在乎。这是你最大的误解——你连解释的力气都没有。",
     },
   },
   {
     id: "convenience-store",
     name: "便利店夜行型",
     code: "C.N.",
-    tagline: "你的深夜避难所，是全家的灯光。",
+    tagline: "你不是失眠，你只是不想结束今天。",
     behavior: [
       "深夜独自去便利店，不是为了买东西，是为了在灯光下待一会",
       "在货架前犹豫了十分钟，最后只买了一瓶水",
       "便利店店员已经认识你了，但你们从不说话",
-      "享受那种'我在人群中但不属于任何人'的自由感",
+      "享受那种'暂时不属于任何人'的感觉",
     ],
     deepNeed: "有一个愿意在深夜陪你去便利店的人。一个不会问'你为什么这么晚还不睡'的人。",
     healedBy: "一个在你说'我去便利店'的时候说'我也去'的人。一个不会问你去买什么的人。",
-    shareText: "我测出来是「便利店夜行型」——深夜的便利店，是我唯一觉得安全的地方。",
+    shareText: "我测出来是「便利店夜行型」——我不是失眠，我只是不想结束今天。",
     color: "#f97316",
     icon: "🏪",
     rarity: 3.9,
@@ -184,10 +184,10 @@ export const personalities: PersonalityType[] = [
     collapseTime: "凌晨1:00-3:00，独自在便利店的时候",
     attackIndex: 1,
     chatDisappear: 62,
-    viralHeadline: "你在便利店的灯光下找到了一种不属于任何人的自由。你不是孤独，你是在充电。",
+    viralHeadline: "你不是失眠，你只是不想结束今天。深夜的便利店是你唯一不用演的地方。",
     hiddenPersonality: {
       name: "消息内耗型",
-      description: "你在便利店的灯光下看起来很平静，但你的脑子里正在重播今天所有的对话。",
+      description: "你在便利店的灯光下看起来很平静，但你的脑子里正在重播今天所有的对话。你不是在逛便利店，你是在逃避回房间之后的自己。",
     },
   },
   {
@@ -214,7 +214,7 @@ export const personalities: PersonalityType[] = [
     viralHeadline: "你有三个社交账号，每个都是不同的面具。真正的你只在没有人认识你的地方才会出现。",
     hiddenPersonality: {
       name: "深夜刷新型",
-      description: "你把自己藏得很深，但你一直在暗处观察着某个人。你的隐身不是不在乎，是太在乎了所以选择消失。",
+      description: "你把自己藏得很深，但你一直在暗处观察着某个人。你的隐身不是不在乎，是太在乎了所以选择消失。你不发朋友圈，但你把别人的朋友圈翻了个遍。",
     },
   },
 ];

@@ -298,11 +298,11 @@ export const questions: Question[] = [
 
 // Micro-feedback shown after certain question thresholds
 export const FEEDBACK_MESSAGES: { after: number; message: string }[] = [
-  { after: 3, message: "原来你也会这样。很多人在深夜反复想这些。" },
-  { after: 6, message: "你似乎总在压抑表达。但你的沉默比语言更诚实。" },
-  { after: 9, message: "你比你表现出来的更敏感。这没什么不好。" },
-  { after: 12, message: "你好像很久没有真正感受过什么了。这不是你的错。" },
-  { after: 15, message: "你在别人面前演了太久。你还记得不演的自己吗？" },
-  { after: 18, message: "你总是在等别人先开口。但你有没有想过，对方也在等你？" },
-  { after: 21, message: "你和现实之间好像隔着一层。你已经习惯了这种距离。" },
+  { after: 3, message: "你删掉的话，比你说出口的多。" },
+  { after: 6, message: "你总是在等别人先开口。但你有没有想过，对方也在等你？" },
+  { after: 9, message: "你在人前笑得很大声。但你已经很久没有真心笑过了。" },
+  { after: 12, message: "你已经习惯了不感受。不是不想，是太累了。" },
+  { after: 15, message: "你在别人面前演了太久。你还记得不演的自己长什么样吗？" },
+  { after: 18, message: "你总是在等别人先主动。但对方也在等你。最后谁都没有开口。" },
+  { after: 21, message: "你把自己藏得很深。但你一直在暗处看着某个人。" },
 ];
