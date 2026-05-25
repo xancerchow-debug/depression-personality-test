@@ -3,28 +3,29 @@ import "./globals.css";
 import CitySkyline from "@/components/CitySkyline";
 
 export const metadata: Metadata = {
-  title: "测测你的抑郁型人格 | 你不是不快乐，你只是形成了自己的精神天气",
+  title: "测测你的互联网精神状态 | 12种人格，你是哪种？",
   description:
-    "一款情绪人格测试，帮你看见自己的精神状态画像。测测你属于哪种抑郁型人格——废墟观察员、深夜失联型、情绪防空洞……",
+    "24道题审判你的互联网人格。已读乱回型、深夜刷新者、消息撤回人格、假装没事症候群……测完你会知道你到底是什么东西。",
   keywords: [
-    "抑郁人格测试",
-    "情绪测试",
-    "精神状态",
-    "人格测试",
+    "互联网人格测试",
+    "精神状态测试",
+    "人格审判",
     "心理测试",
     "emo测试",
-    "MBTI替代",
+    "已读乱回",
+    "深夜emo",
+    "社交电量",
   ],
   openGraph: {
-    title: "测测你的抑郁型人格",
-    description: "你不是不快乐，你只是形成了自己的精神天气。",
+    title: "测测你的互联网精神状态",
+    description: "24道题审判你的人格。测完你会知道——你到底是什么东西。",
     type: "website",
     locale: "zh_CN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "测测你的抑郁型人格",
-    description: "你不是不快乐，你只是形成了自己的精神天气。",
+    title: "测测你的互联网精神状态",
+    description: "24道题审判你的人格。测完你会知道——你到底是什么东西。",
   },
 };
 

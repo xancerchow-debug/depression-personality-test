@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 :root {
   --bg-primary: #0a0a0b;
@@ -122,7 +122,7 @@ body {
   50% { opacity: 0; }
 }
 
-/* Text gradient */
+/* Text gradients */
 .text-gradient {
   background: linear-gradient(135deg, #e4e4e7 0%, #71717a 100%);
   -webkit-background-clip: text;
@@ -132,6 +132,13 @@ body {
 
 .text-gradient-blue {
   background: linear-gradient(135deg, #6b8fc4 0%, #4a6fa5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-red {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -178,9 +185,53 @@ body {
   90% { transform: translate(-10%, 10%); }
 }
 
-/* Hide grain overlay on result page to prevent visual discontinuity */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+}
+
+/* Hide grain overlay on result page */
 body.result-page .grain-overlay {
   display: none;
+}
+
+/* Result page specific styles */
+.result-page-content {
+  position: relative;
+}
+
+.result-page-content::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scanline effect for result page */
+.result-page-content::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Page transition */
@@ -197,6 +248,16 @@ body.result-page .grain-overlay {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Glitch text effect on hover */
+.glitch-text:hover {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Pulse glow for important numbers */
+.pulse-glow {
+  text-shadow: 0 0 20px rgba(74, 111, 165, 0.3), 0 0 40px rgba(74, 111, 165, 0.1);
 }
 
 /* Responsive */

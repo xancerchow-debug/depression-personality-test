@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 const loadingTexts = [
-  "正在分析你的深夜行为模式...",
+  "正在扫描你的聊天记录...",
+  "正在分析你的朋友圈人设...",
+  "正在计算你的深夜emo指数...",
   "正在解码你的社交面具...",
-  "正在计算你的精神内耗值...",
-  "正在扫描你的情绪防御机制...",
-  "正在生成你的精神天气预报...",
-  "正在匹配你的抑郁型人格...",
+  "正在审判你的互联网人格...",
+  "正在生成你的精神状态报告...",
 ];
 
 export default function LoadingPage() {

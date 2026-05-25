@@ -38,6 +38,13 @@ export interface PersonalityType {
   color: string;
   icon: string;
   dimensionInsights: Record<string, string>;
+  // Internet-viral additions
+  rarity: number;           // percentage of people with this type
+  dangerMatch: string;      // most dangerous personality to fall for
+  collapseTime: string;     // most likely time to break down
+  attackIndex: number;      // emotional attack power 1-10
+  chatDisappear: number;    // probability of ghosting in chat 0-100
+  viralHeadline: string;    // share headline for social media
 }
 
 export interface TestResult {
@@ -46,7 +53,7 @@ export interface TestResult {
   matchPercent: number;
   secondMatchPercent: number;
   scores: Record<Dimension, number>;
-  metrics: Record<Dimension, number>; // 6 个维度百分比
+  metrics: Record<Dimension, number>;
   timestamp: number;
   carelessFlag?: boolean;
 }

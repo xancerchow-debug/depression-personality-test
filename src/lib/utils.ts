@@ -10,27 +10,22 @@ export function cn(...inputs: ClassValue[]) {
 
 // Personality signatures: core dimensions that define each type
 // primary = the defining trait (70% weight), secondary = the supporting trait (30% weight)
-// ideal values calibrated for primary-only normalization (scores spread 30-95)
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
 }> = {
-  "ruins-observer":              { primary: { dim: "dissociation", ideal: 78 }, secondary: { dim: "sensitivity", ideal: 62 } },
-  "midnight-disconnect":         { primary: { dim: "dependency", ideal: 72 }, secondary: { dim: "overthinking", ideal: 65 } },
-  "emotional-bunker":            { primary: { dim: "withdrawal", ideal: 75 }, secondary: { dim: "numbness", ideal: 58 } },
-  "high-sensitivity-camouflage": { primary: { dim: "sensitivity", ideal: 78 }, secondary: { dim: "performance", ideal: 55 } },
-  "read-no-reply-philosopher":   { primary: { dim: "overthinking", ideal: 78 }, secondary: { dim: "dissociation", ideal: 52 } },
-  "smiling-collapse":            { primary: { dim: "performance", ideal: 72 }, secondary: { dim: "collapse", ideal: 60 } },
-  "permanent-standby":           { primary: { dim: "numbness", ideal: 72 }, secondary: { dim: "withdrawal", ideal: 58 } },
-  "self-destruct-warning":       { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "sensitivity", ideal: 52 } },
-  "night-owl-philosopher":       { primary: { dim: "overthinking", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 55 } },
-  "cyber-ghost":                 { primary: { dim: "dissociation", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 55 } },
-  "void-wanderer":               { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "dissociation", ideal: 55 } },
-  "people-pleaser":              { primary: { dim: "dependency", ideal: 78 }, secondary: { dim: "performance", ideal: 65 } },
-  "rational-isolator":           { primary: { dim: "withdrawal", ideal: 68 }, secondary: { dim: "numbness", ideal: 58 } },
-  "emotional-overload":          { primary: { dim: "sensitivity", ideal: 75 }, secondary: { dim: "collapse", ideal: 55 } },
-  "emotional-storm":             { primary: { dim: "sensitivity", ideal: 72 }, secondary: { dim: "overthinking", ideal: 58 } },
-  "self-exile":                  { primary: { dim: "withdrawal", ideal: 72 }, secondary: { dim: "dissociation", ideal: 48 } },
+  "ghost-replier":       { primary: { dim: "overthinking", ideal: 75 }, secondary: { dim: "dissociation", ideal: 55 } },
+  "midnight-refresher":  { primary: { dim: "sensitivity", ideal: 78 }, secondary: { dim: "dependency", ideal: 60 } },
+  "recall-personality":  { primary: { dim: "overthinking", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
+  "pretend-ok":          { primary: { dim: "performance", ideal: 78 }, secondary: { dim: "numbness", ideal: 55 } },
+  "social-fuse":         { primary: { dim: "numbness", ideal: 75 }, secondary: { dim: "withdrawal", ideal: 60 } },
+  "sober-collapse":      { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "overthinking", ideal: 58 } },
+  "emotion-cache":       { primary: { dim: "numbness", ideal: 72 }, secondary: { dim: "withdrawal", ideal: 58 } },
+  "cyber-ghost":         { primary: { dim: "dissociation", ideal: 78 }, secondary: { dim: "withdrawal", ideal: 55 } },
+  "night-philosopher":   { primary: { dim: "overthinking", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 55 } },
+  "emotion-diet":        { primary: { dim: "numbness", ideal: 78 }, secondary: { dim: "dissociation", ideal: 55 } },
+  "low-battery":         { primary: { dim: "numbness", ideal: 70 }, secondary: { dim: "dependency", ideal: 52 } },
+  "persona-maintainer":  { primary: { dim: "performance", ideal: 72 }, secondary: { dim: "sensitivity", ideal: 58 } },
 };
 
 // Dimensions to show as metrics (6 of 8)
@@ -53,7 +48,6 @@ for (const q of questions) {
 }
 
 // Compute display metrics using ONLY primary-dimension questions
-// This gives clean 0-100% values without secondary weight inflation
 function calcPrimaryScores(
   answers: Record<number, string | null>,
   shuffledQuestions: Question[],
@@ -80,7 +74,6 @@ function calcMatchPercent(
   const sig = PERSONALITY_SIGNATURES[personalityId];
   if (!sig) return 0;
 
-  // Use the clean primary-only metrics (0-100) directly
   const userNorm = metrics;
 
   const primaryMatch = Math.max(0, Math.min(100,
@@ -115,7 +108,7 @@ function detectCareless(
     const opt = q.options.find(o => o.id === optId);
     if (opt && opt.score === 1) count++;
   }
-  return count >= 5;
+  return count >= 3;
 }
 
 export function calculateResult(
@@ -123,7 +116,7 @@ export function calculateResult(
   answers?: Record<number, string | null>,
   shuffledQuestions?: Question[],
 ): TestResult {
-  // Display metrics: primary-only scores (clean 0-100%, no secondary weight inflation)
+  // Display metrics: primary-only scores (clean 0-100%)
   const metrics: Record<Dimension, number> = {} as Record<Dimension, number>;
   if (answers && shuffledQuestions) {
     const primaryScores = calcPrimaryScores(answers, shuffledQuestions);
@@ -132,7 +125,6 @@ export function calculateResult(
       metrics[dim] = maxRaw > 0 ? Math.min(100, Math.round((primaryScores[dim] / maxRaw) * 100)) : 0;
     }
   } else {
-    // Fallback: use full scores (for skip/random mode)
     for (const dim of Object.keys(scores) as Dimension[]) {
       const maxRaw = PRIMARY_Q_COUNT[dim] * 4;
       metrics[dim] = maxRaw > 0 ? Math.min(100, Math.round((scores[dim] / maxRaw) * 100)) : 0;
@@ -179,7 +171,7 @@ export { DISPLAY_DIMENSIONS };
 export function generateShareText(personalityId: string): string {
   const p = personalities.find((p) => p.id === personalityId);
   if (!p) return "";
-  return `我在「测测你的抑郁型人格」里测出了「${p.name}」——${p.tagline}\n\n你也来测测？`;
+  return `我在「测测你的互联网精神状态」里测出了「${p.name}」——${p.tagline}\n\n你也来测测？`;
 }
 
 export function generateShareUrl(resultId: string): string {

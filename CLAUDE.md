@@ -10,11 +10,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-A Chinese-language personality test web app ("测测你的抑郁型人格") built with Next.js 15 App Router, TypeScript, TailwindCSS, and Framer Motion. Deployed to Vercel with auto-deploy on push.
+A Chinese-language internet personality test ("测测你的互联网精神状态") built with Next.js 15 App Router, TypeScript, TailwindCSS, and Framer Motion. Deployed to Vercel with auto-deploy on push.
 
 ### Page flow
 
-`/` (homepage) → `/test` (36 questions) → `/loading` (animation + API POST) → `/result` (personality result)
+`/` (homepage) → `/test` (24 questions) → `/loading` (animation + API POST) → `/result` (personality result)
 
 Test answers are computed into scores on the test page, stored in `sessionStorage` as `testResult`, and read by the loading and result pages.
 
@@ -22,23 +22,23 @@ Test answers are computed into scores on the test page, stored in `sessionStorag
 
 - 8 dimensions: `sensitivity`, `withdrawal`, `overthinking`, `numbness`, `performance`, `dependency`, `dissociation`, `collapse`
 - Each question has 4 options scoring 1-4 across relevant dimensions
-- Raw score per dimension max = 144 (36 questions × 4 points)
-- Display metrics = `raw_score / 144 × 100` (simple percentage, no complex formulas)
+- Display metrics use primary-only normalization: `raw_primary_score / (primary_question_count * 4) * 100`
 - 6 of 8 dimensions are displayed; `dependency` and `collapse` feed into personality matching only
 
 ### Personality matching (`src/lib/utils.ts`)
 
-- 16 personality types defined in `src/data/personalities.ts`
+- 12 personality types defined in `src/data/personalities.ts`
 - Each personality has a signature: primary dimension (70% weight) + secondary dimension (30% weight) with ideal values
 - Match = `primaryMatch * 0.7 + secondaryMatch * 0.3` where match = `clamp(100 - |userNorm - ideal| * multiplier, 0, 100)`
 - Penalty if core dimension is below half the ideal threshold
+- Same-primary-dimension penalty for second match (0.55x)
 - Returns best match (primary) + second best match with match percentages
 - Match percent clamped to [5, 98]
 
 ### Data files
 
-- `src/data/questions.ts` — 36 questions, each with `dimension` and 4 `options` containing `scores` per dimension
-- `src/data/personalities.ts` — 16 personality types with descriptions, behaviors, share text, color, icon
+- `src/data/questions.ts` — 24 questions, each with `dimension` and 4 `options` containing `scores` per dimension
+- `src/data/personalities.ts` — 12 personality types with descriptions, behaviors, share text, color, icon, dimensionInsights, rarity, dangerMatch, collapseTime, attackIndex, chatDisappear, viralHeadline
 - `src/types/index.ts` — TypeScript interfaces for `Question`, `Option`, `Dimension`, `PersonalityType`, `TestResult`
 
 ### Supabase (optional)
@@ -52,6 +52,7 @@ Supabase is optional. Without it, the app still works — results are just not p
 - City skyline component (`src/components/CitySkyline.tsx`) rendered in layout — SVG with flickering window lights
 - Frosted glass cards (`.glass` / `.glass-strong` classes)
 - Text gradients: `.text-gradient`, `.text-gradient-blue`
+- Vignette + scanline effects on result page
 - Framer Motion for all page transitions and micro-interactions
 
 ### Deployment
@@ -67,4 +68,4 @@ git push
 
 ## String escaping note
 
-The codebase contains Chinese text with curly quotes (「」""''). When editing strings that contain double quotes inside double-quoted strings, switch to backtick template literals to avoid parse errors. This has been a recurring issue in `questions.ts` and `personalities.ts`.
+The codebase contains Chinese text with curly quotes (「」""''). When editing strings that contain double quotes inside double-quoted strings, switch to backtick template literals to avoid parse errors.

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-const headline = "测测你的抑郁型人格";
-const subtitle = "你不是不快乐，你只是形成了自己的精神天气。";
-const BASE_COUNT = 12847;
+const headline = "测测你的互联网精神状态";
+const subtitle = "24道题，审判你的人格。";
+const BASE_COUNT = 28743;
 
 export default function HomePage() {
   const [showContent, setShowContent] = useState(false);
@@ -21,7 +21,6 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    // Fetch live count from API
     fetch("/api/stats")
       .then((r) => r.json())
       .then((data) => {
@@ -45,7 +44,6 @@ export default function HomePage() {
         i++;
       } else {
         clearInterval(typeHeadline);
-        // Start subtitle
         let j = 0;
         const typeSubtitle = setInterval(() => {
           if (j < subtitle.length) {
@@ -55,7 +53,7 @@ export default function HomePage() {
             clearInterval(typeSubtitle);
             setTimeout(() => setShowButton(true), 300);
           }
-        }, 60);
+        }, 80);
       }
     }, 100);
 
@@ -66,46 +64,27 @@ export default function HomePage() {
     <main className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
       {/* Ambient background */}
       <div className="absolute inset-0">
-        {/* Radial gradient center */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20"
           style={{
-            background:
-              "radial-gradient(circle, rgba(74, 111, 165, 0.15) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(74, 111, 165, 0.15) 0%, transparent 70%)",
           }}
         />
-        {/* Floating orbs */}
         <motion.div
           className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full"
           style={{
-            background:
-              "radial-gradient(circle, rgba(74, 111, 165, 0.08) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(74, 111, 165, 0.08) 0%, transparent 70%)",
           }}
-          animate={{
-            x: [0, 30, -20, 0],
-            y: [0, -20, 10, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ x: [0, 30, -20, 0], y: [0, -20, 10, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute bottom-1/3 right-1/4 w-48 h-48 rounded-full"
           style={{
-            background:
-              "radial-gradient(circle, rgba(107, 143, 196, 0.06) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(107, 143, 196, 0.06) 0%, transparent 70%)",
           }}
-          animate={{
-            x: [0, -25, 15, 0],
-            y: [0, 15, -25, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ x: [0, -25, 15, 0], y: [0, 15, -25, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
@@ -118,15 +97,15 @@ export default function HomePage() {
             transition={{ duration: 1 }}
             className="relative z-10 text-center max-w-2xl mx-auto"
           >
-            {/* Small tag */}
+            {/* Tag */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-8"
             >
-              <span className="inline-block px-4 py-1.5 text-xs tracking-[0.3em] uppercase text-dark-400 border border-dark-800 rounded-full">
-                Emotional Personality Test
+              <span className="inline-block px-4 py-1.5 text-[10px] tracking-[0.4em] uppercase text-dark-500 border border-dark-800/50 rounded-full">
+                PERSONALITY JUDGMENT
               </span>
             </motion.div>
 
@@ -135,7 +114,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6"
             >
               <span className="text-gradient">{typedHeadline}</span>
               {typedHeadline.length < headline.length && (
@@ -162,11 +141,11 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 0.8 }}
-              className="text-sm text-dark-500 mb-12 max-w-md mx-auto"
+              className="text-sm text-dark-600 mb-12 max-w-md mx-auto leading-relaxed"
             >
-              36道题，帮你画出自己的精神状态画像。
+              不是心理测试，是互联网人格身份认证。
               <br />
-              不是诊断，只是照镜子。
+              测完你会知道——你到底是什么东西。
             </motion.p>
 
             {/* CTA Button */}
@@ -179,21 +158,17 @@ export default function HomePage() {
                 >
                   <Link href="/test">
                     <motion.button
-                      className="group relative px-12 py-4 text-base font-medium tracking-wider overflow-hidden rounded-lg"
+                      className="group relative px-14 py-4 text-base font-medium tracking-wider overflow-hidden rounded-lg"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      {/* Button background */}
                       <div className="absolute inset-0 bg-gradient-to-r from-cold-dim to-cold-blue opacity-90 group-hover:opacity-100 transition-opacity" />
                       <div className="absolute inset-0 glass opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                      {/* Button glow */}
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-50 transition-opacity duration-500">
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                       </div>
-
                       <span className="relative z-10 text-white/90 group-hover:text-white transition-colors">
-                        开始测试
+                        开始审判
                       </span>
                     </motion.button>
                   </Link>
@@ -202,9 +177,9 @@ export default function HomePage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.6 }}
-                    className="mt-6 text-xs text-dark-600"
+                    className="mt-6 text-xs text-dark-700"
                   >
-                    已有 {testCount.toLocaleString()} 人完成了测试
+                    已有 <span className="text-dark-500 font-mono">{testCount.toLocaleString()}</span> 人被审判
                   </motion.p>
                 </motion.div>
               )}
@@ -220,8 +195,8 @@ export default function HomePage() {
         transition={{ delay: 2, duration: 1 }}
         className="absolute bottom-8 left-0 right-0 text-center"
       >
-        <p className="text-[11px] text-dark-700 tracking-widest">
-          情绪人格测试 · 非医学诊断 · 仅供自我探索
+        <p className="text-[10px] text-dark-800 tracking-widest">
+          互联网人格审判 · 非医学诊断 · 纯属真实
         </p>
       </motion.div>
     </main>

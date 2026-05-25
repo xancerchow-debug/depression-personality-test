@@ -142,7 +142,7 @@ export default function TestPage() {
               onClick={handleSkip}
               className="ml-3 text-[10px] text-dark-700 hover:text-dark-400 transition-colors"
             >
-              [跳过]
+              [跳过审判]
             </button>
           </span>
           <button
@@ -188,7 +188,7 @@ export default function TestPage() {
               className="mb-6"
             >
               <span className="text-[10px] font-mono text-dark-600 tracking-[0.3em] uppercase">
-                Question {String(currentIndex + 1).padStart(2, "0")}
+                JUDGMENT {String(currentIndex + 1).padStart(2, "0")}
               </span>
             </motion.div>
 
@@ -260,7 +260,7 @@ export default function TestPage() {
             ? currentIndex < shuffledQuestions.length - 1
               ? "点击右箭头进入下一题"
               : "已完成所有题目"
-            : "选择最接近你真实想法的选项"}
+            : "选最扎心的那个"}
         </p>
       </div>
     </main>
