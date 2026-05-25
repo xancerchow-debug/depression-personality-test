@@ -3,9 +3,9 @@ import "./globals.css";
 import CitySkyline from "@/components/CitySkyline";
 
 export const metadata: Metadata = {
-  title: "测测你的互联网精神状态 | 12种人格，你是哪种？",
+  title: "测测你的互联网精神状态 | 10种人格，你是哪种？",
   description:
-    "24道题审判你的互联网人格。已读乱回型、深夜刷新者、消息撤回人格、假装没事症候群……测完你会知道你到底是什么东西。",
+    "24道题审判你的互联网人格。输入框删除型、深夜刷新型、假装无所谓型、耳机逃生型……测完你会知道你到底是什么东西。",
   keywords: [
     "互联网人格测试",
     "精神状态测试",

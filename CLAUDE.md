@@ -27,18 +27,19 @@ Test answers are computed into scores on the test page, stored in `sessionStorag
 
 ### Personality matching (`src/lib/utils.ts`)
 
-- 12 personality types defined in `src/data/personalities.ts`
-- Each personality has a signature: primary dimension (70% weight) + secondary dimension (30% weight) with ideal values
-- Match = `primaryMatch * 0.7 + secondaryMatch * 0.3` where match = `clamp(100 - |userNorm - ideal| * multiplier, 0, 100)`
-- Penalty if core dimension is below half the ideal threshold
-- Same-primary-dimension penalty for second match (0.55x)
-- Returns best match (primary) + second best match with match percentages
-- Match percent clamped to [5, 98]
+- 10 personality types defined in `src/data/personalities.ts`
+- Each personality has a signature: primary dimension (75% weight) + secondary dimension (25% weight) with ideal values
+- Match = `primaryMatch * 0.75 + secondaryMatch * 0.25` where match = `clamp(100 - |userNorm - ideal| * multiplier, 0, 100)`
+- Primary multiplier 3.0, secondary multiplier 1.5
+- Penalty if core dimension < ideal * 0.45 → score cut by 60%
+- Same-primary-dimension penalty for second match (0.4x)
+- Third match penalty if >= 75% of second (0.5x)
+- Match percent clamped to [5, 97]
 
 ### Data files
 
 - `src/data/questions.ts` — 24 questions, each with `dimension` and 4 `options` containing `scores` per dimension
-- `src/data/personalities.ts` — 12 personality types with descriptions, behaviors, share text, color, icon, dimensionInsights, rarity, dangerMatch, collapseTime, attackIndex, chatDisappear, viralHeadline
+- `src/data/personalities.ts` — 10 personality types with descriptions, behaviors, share text, color, icon, rarity, dangerMatch, collapseTime, attackIndex, chatDisappear, viralHeadline, hiddenPersonality
 - `src/types/index.ts` — TypeScript interfaces for `Question`, `Option`, `Dimension`, `PersonalityType`, `TestResult`
 
 ### Supabase (optional)

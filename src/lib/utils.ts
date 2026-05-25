@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// 8 personalities × 8 dimensions, each primary dimension UNIQUE
-// Ideal values spread 65-85 for maximum separation
+// 10 personalities × 8 dimensions
+// Some primary dimensions repeat — algorithm handles via same-primary penalty
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
@@ -20,8 +20,10 @@ const PERSONALITY_SIGNATURES: Record<string, {
   "earphone-escape":     { primary: { dim: "withdrawal", ideal: 80 }, secondary: { dim: "numbness", ideal: 55 } },
   "emotion-performer":   { primary: { dim: "performance", ideal: 82 }, secondary: { dim: "sensitivity", ideal: 60 } },
   "social-fuse":         { primary: { dim: "collapse", ideal: 75 }, secondary: { dim: "withdrawal", ideal: 58 } },
-  "convenience-store":   { primary: { dim: "dependency", ideal: 68 }, secondary: { dim: "withdrawal", ideal: 62 } },
+  "chat-replay":         { primary: { dim: "overthinking", ideal: 78 }, secondary: { dim: "sensitivity", ideal: 60 } },
   "social-stalker":      { primary: { dim: "dissociation", ideal: 82 }, secondary: { dim: "withdrawal", ideal: 55 } },
+  "relation-tester":     { primary: { dim: "performance", ideal: 75 }, secondary: { dim: "dependency", ideal: 62 } },
+  "cold-reply":          { primary: { dim: "numbness", ideal: 72 }, secondary: { dim: "performance", ideal: 58 } },
 };
 
 // Display dimensions (6 of 8)
@@ -63,7 +65,7 @@ function calcPrimaryScores(
   return result;
 }
 
-// Match percent: high multiplier + unique primaries = big gaps
+// Match percent: 3.0x primary multiplier for wide gaps
 function calcMatchPercent(
   metrics: Record<Dimension, number>,
   personalityId: string,
@@ -73,10 +75,10 @@ function calcMatchPercent(
 
   const userNorm = metrics;
 
-  // Primary: 2.5x multiplier for strong separation
+  // Primary: 3.0x multiplier — deviation costs 3 points per 1 point off
   const primaryDiff = Math.abs(userNorm[sig.primary.dim] - sig.primary.ideal);
   const primaryMatch = Math.max(0, Math.min(100,
-    100 - primaryDiff * 2.5
+    100 - primaryDiff * 3.0
   ));
 
   let secondaryMatch = 0;
@@ -89,9 +91,9 @@ function calcMatchPercent(
 
   let percent = Math.round(primaryMatch * 0.75 + secondaryMatch * 0.25);
 
-  // Penalty: core dimension too low (below 45% of ideal)
+  // Penalty: core dimension below 45% of ideal → cut by 60%
   if (userNorm[sig.primary.dim] < sig.primary.ideal * 0.45) {
-    percent = Math.round(percent * 0.45);
+    percent = Math.round(percent * 0.4);
   }
 
   return Math.max(5, Math.min(97, percent));
@@ -143,12 +145,12 @@ export function calculateResult(
   const topSig = PERSONALITY_SIGNATURES[matches[0].id];
   const secondSig = PERSONALITY_SIGNATURES[matches[1].id];
   if (topSig && secondSig && topSig.primary.dim === secondSig.primary.dim) {
-    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.45));
+    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.4));
   }
 
   // Third must be well below second
-  if (matches[2].percent >= matches[1].percent * 0.8) {
-    matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.55));
+  if (matches[2].percent >= matches[1].percent * 0.75) {
+    matches[2].percent = Math.max(5, Math.round(matches[2].percent * 0.5));
   }
 
   // Calculate derived metrics
