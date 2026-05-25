@@ -118,6 +118,13 @@ export function calculateResult(
     }))
     .sort((a, b) => b.percent - a.percent);
 
+  // If top two share the same primary dimension, penalize the second
+  const topSig = PERSONALITY_SIGNATURES[matches[0].id];
+  const secondSig = PERSONALITY_SIGNATURES[matches[1].id];
+  if (topSig && secondSig && topSig.primary.dim === secondSig.primary.dim) {
+    matches[1].percent = Math.max(5, Math.round(matches[1].percent * 0.55));
+  }
+
   let carelessFlag = false;
   if (answers && shuffledQuestions) {
     const cleaned: Record<number, string> = {};
