@@ -25,42 +25,32 @@ function StatBar({ label, value }: { label: string; value: number }) {
   }, [value]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="mb-5"
-    >
+    <div className="mb-5">
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs text-dark-500">{label}</span>
         <span className="text-xs font-mono text-dark-400">{displayValue}</span>
       </div>
       <div className="h-1 bg-dark-900 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: "linear-gradient(90deg, #2d4a73, #4a6fa5, #6b8fc4)" }}
-          initial={{ width: 0 }}
-          animate={{ width: `${value}%` }}
-          transition={{ duration: 1, ease: "easeOut" }}
+        <div
+          className="h-full rounded-full transition-all duration-1000 ease-out"
+          style={{
+            background: "linear-gradient(90deg, #2d4a73, #4a6fa5, #6b8fc4)",
+            width: `${value}%`,
+          }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 function InfoSection({ title, content }: { title: string; content: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="mb-8"
-    >
+    <div className="mb-8">
       <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
         {title}
       </h3>
       <p className="text-sm text-dark-300 leading-relaxed">{content}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -129,24 +119,14 @@ export default function ResultPage() {
         />
 
         <div className="relative max-w-lg mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6"
-          >
+          <div className="mb-6">
             <span className="inline-block px-4 py-1.5 text-[10px] tracking-[0.3em] uppercase text-dark-500 border border-dark-800 rounded-full">
               Your Personality Type
             </span>
-          </motion.div>
+          </div>
 
           {/* Icon */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring" }}
-            className="text-5xl mb-6 inline-block"
-          >
+          <div className="text-5xl mb-6 inline-block">
             <motion.span
               animate={{ y: [0, -6, 0], rotate: [0, -3, 3, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -154,56 +134,31 @@ export default function ResultPage() {
             >
               {personality.icon}
             </motion.span>
-          </motion.div>
+          </div>
 
           {/* Name */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold mb-2"
-          >
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
             <span className="text-gradient">{personality.name}</span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-xs font-mono text-dark-600 tracking-[0.3em] mb-4"
-          >
+          <p className="text-xs font-mono text-dark-600 tracking-[0.3em] mb-4">
             {personality.code}
-          </motion.p>
+          </p>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-base text-dark-400 italic"
-          >
+          <p className="text-base text-dark-400 italic">
             &ldquo;{personality.tagline}&rdquo;
-          </motion.p>
+          </p>
         </div>
       </div>
 
-      {/* Match badge — replaces fake percentile */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-lg mx-auto px-6 mb-10"
-      >
+      {/* Match badge */}
+      <div className="max-w-lg mx-auto px-6 mb-10">
         <div className="glass rounded-2xl p-6 text-center">
           <p className="text-xs text-dark-600 mb-2">你最接近的人格类型</p>
           <div className="flex items-baseline justify-center gap-1">
-            <motion.span
-              className="text-5xl font-bold text-gradient-blue"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
+            <span className="text-5xl font-bold text-gradient-blue">
               {result.matchPercent}
-            </motion.span>
+            </span>
             <span className="text-lg text-dark-500">%</span>
           </div>
           <p className="text-xs text-dark-500 mt-2">契合度</p>
@@ -211,32 +166,22 @@ export default function ResultPage() {
 
         {/* Second personality */}
         {secondPersonality && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mt-4 glass rounded-xl p-4 flex items-center gap-4"
-          >
+          <div className="mt-4 glass rounded-xl p-4 flex items-center gap-4">
             <span className="text-2xl">{secondPersonality.icon}</span>
             <div className="flex-1 text-left">
               <p className="text-xs text-dark-500">你也有 {result.secondMatchPercent}% 的特质属于</p>
               <p className="text-sm text-dark-300 font-medium">{secondPersonality.name}</p>
             </div>
             <span className="text-xs font-mono text-dark-600">{secondPersonality.code}</span>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
-      {/* Stats — 6 dimensions from raw scores */}
+      {/* Stats */}
       <div className="max-w-lg mx-auto px-6 mb-12">
-        <motion.h3
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-6"
-        >
+        <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-6">
           Your Profile
-        </motion.h3>
+        </h3>
 
         <div className="glass rounded-2xl p-6">
           {DISPLAY_DIMENSIONS.map((dim) => (
@@ -251,16 +196,11 @@ export default function ResultPage() {
 
       {/* Description */}
       <div className="max-w-lg mx-auto px-6 mb-12">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="glass rounded-2xl p-6"
-        >
+        <div className="glass rounded-2xl p-6">
           <p className="text-sm text-dark-300 leading-[1.8]">
             {personality.description}
           </p>
-        </motion.div>
+        </div>
       </div>
 
       {/* Detail sections */}
@@ -269,38 +209,23 @@ export default function ResultPage() {
         <InfoSection title="恋爱表现" content={personality.loveBehavior} />
         <InfoSection title="深层心理需求" content={personality.deepNeed} />
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="glass rounded-2xl p-6 mb-8"
-        >
+        <div className="glass rounded-2xl p-6 mb-8">
           <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
             最容易被谁治愈
           </h3>
           <p className="text-sm text-dark-300 leading-relaxed">{personality.healedBy}</p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="glass rounded-2xl p-6 mb-8"
-        >
+        <div className="glass rounded-2xl p-6 mb-8">
           <h3 className="text-xs font-mono text-dark-600 tracking-[0.2em] uppercase mb-3">
             别人对你的误解
           </h3>
           <p className="text-sm text-dark-300 leading-relaxed">{personality.misunderstoodAs}</p>
-        </motion.div>
+        </div>
       </div>
 
       {/* Share section */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-lg mx-auto px-6 mt-16"
-      >
+      <div className="max-w-lg mx-auto px-6 mt-16">
         <div className="text-center mb-8">
           <p className="text-sm text-dark-500 mb-1">你的分享文案</p>
           <p className="text-xs text-dark-600">截图保存，发到你的社交平台</p>
@@ -330,7 +255,7 @@ export default function ResultPage() {
             再测一次
           </motion.button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Disclaimer */}
       <div className="max-w-lg mx-auto px-6 mt-16">
