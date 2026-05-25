@@ -30,8 +30,8 @@ function StatBar({ label, value }: { label: string; value: number }) {
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       className="mb-5"
@@ -57,8 +57,8 @@ function StatBar({ label, value }: { label: string; value: number }) {
 function InfoSection({ title, content }: { title: string; content: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       className="mb-8"
@@ -216,8 +216,8 @@ export default function ResultPage() {
         {/* Second personality */}
         {secondPersonality && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             className="mt-4 glass rounded-xl p-4 flex items-center gap-4"
@@ -258,8 +258,8 @@ export default function ResultPage() {
       {/* Description */}
       <div className="max-w-lg mx-auto px-6 mb-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6"
@@ -277,8 +277,8 @@ export default function ResultPage() {
         <InfoSection title="深层心理需求" content={personality.deepNeed} />
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
@@ -290,8 +290,8 @@ export default function ResultPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="glass rounded-2xl p-6 mb-8"
@@ -305,8 +305,8 @@ export default function ResultPage() {
 
       {/* Share section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
         className="max-w-lg mx-auto px-6 mt-16"
