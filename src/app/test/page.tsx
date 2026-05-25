@@ -37,22 +37,6 @@ export default function TestPage() {
   const currentQuestion = shuffledQuestions[currentIndex];
   const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100;
 
-  const handleSkip = useCallback(() => {
-    const newScores = emptyScores();
-    const randomAnswers: Record<number, string | null> = {};
-    for (const q of shuffledQuestions) {
-      const randomOpt = q.options[Math.floor(Math.random() * q.options.length)];
-      randomAnswers[q.id] = randomOpt.id;
-      const effectiveScore = q.reverse ? (5 - randomOpt.score) : randomOpt.score;
-      for (const [dim, weight] of Object.entries(randomOpt.weights)) {
-        if (weight > 0) newScores[dim as Dimension] += effectiveScore * weight;
-      }
-    }
-    const result = calculateResult(newScores, randomAnswers, shuffledQuestions);
-    sessionStorage.setItem("testResult", JSON.stringify(result));
-    router.push("/loading");
-  }, [router, shuffledQuestions]);
-
   const handleAnswer = useCallback(
     (optionId: string) => {
       if (isTransitioning) return;
@@ -151,12 +135,6 @@ export default function TestPage() {
           </button>
           <span className="text-xs text-dark-600 font-mono tracking-wider">
             {String(currentIndex + 1).padStart(2, "0")} / {shuffledQuestions.length}
-            <button
-              onClick={handleSkip}
-              className="ml-3 text-[10px] text-dark-700 hover:text-dark-400 transition-colors"
-            >
-              [跳过]
-            </button>
           </span>
           <button
             onClick={() => {
