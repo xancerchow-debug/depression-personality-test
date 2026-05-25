@@ -10,20 +10,32 @@ export function cn(...inputs: ClassValue[]) {
 
 // 10 personalities × 8 behavioral dimensions
 // Each personality is defined by WHAT THEY DO, not how much they feel
+// 4-path personality signatures
+// Path A 焦虑确认: rumination + surveillance
+// Path B 回避防御: avoidance + isolation
+// Path C 情绪表达: provocation + testing
+// Path D 压抑隐藏: masking + eruption
 const PERSONALITY_SIGNATURES: Record<string, {
   primary: { dim: Dimension; ideal: number };
   secondary?: { dim: Dimension; ideal: number };
 }> = {
-  "message-ruminator":   { primary: { dim: "rumination", ideal: 78 }, secondary: { dim: "surveillance", ideal: 55 } },
-  "midnight-scroller":   { primary: { dim: "surveillance", ideal: 80 }, secondary: { dim: "rumination", ideal: 60 } },
-  "pretend-whatever":    { primary: { dim: "masking", ideal: 76 }, secondary: { dim: "avoidance", ideal: 58 } },
-  "earphone-escape":     { primary: { dim: "isolation", ideal: 75 }, secondary: { dim: "masking", ideal: 55 } },
-  "emotion-performer":   { primary: { dim: "provocation", ideal: 78 }, secondary: { dim: "surveillance", ideal: 60 } },
-  "social-fuse":         { primary: { dim: "eruption", ideal: 72 }, secondary: { dim: "isolation", ideal: 58 } },
-  "chat-replay":         { primary: { dim: "rumination", ideal: 75 }, secondary: { dim: "surveillance", ideal: 62 } },
-  "social-stalker":      { primary: { dim: "surveillance", ideal: 78 }, secondary: { dim: "avoidance", ideal: 55 } },
-  "relation-tester":     { primary: { dim: "testing", ideal: 76 }, secondary: { dim: "surveillance", ideal: 60 } },
-  "cold-reply":          { primary: { dim: "masking", ideal: 72 }, secondary: { dim: "testing", ideal: 58 } },
+  // Path A: 焦虑确认型（害怕失去回应）
+  "message-ruminator":   { primary: { dim: "rumination", ideal: 80 }, secondary: { dim: "surveillance", ideal: 55 } },
+  "midnight-scroller":   { primary: { dim: "surveillance", ideal: 80 }, secondary: { dim: "rumination", ideal: 55 } },
+
+  // Path B: 回避防御型（害怕真正靠近）
+  "earphone-escape":     { primary: { dim: "isolation", ideal: 78 }, secondary: { dim: "avoidance", ideal: 55 } },
+  "cold-reply":          { primary: { dim: "avoidance", ideal: 76 }, secondary: { dim: "masking", ideal: 58 } },
+
+  // Path C: 情绪表达型（希望别人发现情绪）
+  "emotion-performer":   { primary: { dim: "provocation", ideal: 78 }, secondary: { dim: "testing", ideal: 55 } },
+  "relation-tester":     { primary: { dim: "testing", ideal: 78 }, secondary: { dim: "provocation", ideal: 55 } },
+
+  // Path D: 压抑隐藏型（习惯自己消化情绪）
+  "pretend-whatever":    { primary: { dim: "masking", ideal: 78 }, secondary: { dim: "avoidance", ideal: 55 } },
+  "social-fuse":         { primary: { dim: "eruption", ideal: 75 }, secondary: { dim: "isolation", ideal: 55 } },
+  "chat-replay":         { primary: { dim: "rumination", ideal: 75 }, secondary: { dim: "surveillance", ideal: 60 } },
+  "social-stalker":      { primary: { dim: "surveillance", ideal: 76 }, secondary: { dim: "avoidance", ideal: 55 } },
 };
 
 // Display dimensions (6 of 8)

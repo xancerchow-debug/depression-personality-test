@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { questions } from "@/data/questions";
+import { questions, PATH_DISCRIMINATOR_COUNT, refinementQuestionPool } from "@/data/questions";
 import { calculateResult } from "@/lib/utils";
 import { Dimension, Question } from "@/types";
 
@@ -23,9 +23,12 @@ const emptyScores = (): Record<Dimension, number> => ({
 
 export default function TestPage() {
   const router = useRouter();
-  const [shuffledQuestions] = useState(() =>
-    shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) }))
-  );
+  const [shuffledQuestions] = useState(() => {
+    // 前5题固定顺序（路径判别），后19题 shuffle
+    const pathQs = questions.slice(0, PATH_DISCRIMINATOR_COUNT);
+    const restQs = shuffle(refinementQuestionPool);
+    return [...pathQs, ...restQs].map((q) => ({ ...q, options: shuffle(q.options) }));
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<Record<Dimension, number>>(emptyScores());
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
