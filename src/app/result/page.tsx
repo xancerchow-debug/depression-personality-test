@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getPersonalityById } from "@/data/personalities";
+import { paidReports, lockedPreviews } from "@/data/paidReports";
 import { TestResult, PersonalityType } from "@/types";
 
 function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
@@ -47,6 +48,7 @@ export default function ResultPage() {
   const [thirdPersonality, setThirdPersonality] = useState<PersonalityType | null>(null);
   const [copied, setCopied] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("result-page");
@@ -59,9 +61,13 @@ export default function ResultPage() {
     try {
       const parsed: TestResult = JSON.parse(stored);
       setResult(parsed);
-      setPersonality(getPersonalityById(parsed.personalityId) || null);
+      const p = getPersonalityById(parsed.personalityId) || null;
+      setPersonality(p);
       setSecondPersonality(getPersonalityById(parsed.secondPersonalityId) || null);
       setThirdPersonality(getPersonalityById(parsed.thirdPersonalityId) || null);
+      if (p) {
+        setUnlocked(localStorage.getItem(`unlocked_${p.id}`) === "true");
+      }
       setTimeout(() => setShowContent(true), 200);
     } catch { router.push("/"); }
   }, [router]);
@@ -74,6 +80,18 @@ export default function ResultPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleUnlock = () => {
+    if (!personality) return;
+    const report = paidReports[personality.id];
+    const confirmed = window.confirm(
+      `${report?.hook || "解锁完整人格报告？"}\n\n价格：¥9.9\n\n点击确定解锁`
+    );
+    if (confirmed && personality) {
+      localStorage.setItem(`unlocked_${personality.id}`, "true");
+      setUnlocked(true);
+    }
+  };
+
   if (!result || !personality) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -81,6 +99,8 @@ export default function ResultPage() {
       </main>
     );
   }
+
+  const report = paidReports[personality.id];
 
   return (
     <main className="min-h-screen pb-32 result-page-content">
@@ -134,7 +154,6 @@ export default function ResultPage() {
                 {personality.code}
               </motion.p>
 
-              {/* THE punch line */}
               <motion.p
                 className="text-lg sm:text-xl text-dark-200 font-medium leading-relaxed max-w-md mx-auto"
                 initial={{ opacity: 0, y: 15 }}
@@ -166,154 +185,254 @@ export default function ResultPage() {
             </div>
           </motion.section>
 
-          {/* ═══ THREE INDEXES ═══ */}
+          {/* ═══ BEHAVIOR LIST（免费：只显示3条） ═══ */}
           <motion.section
             className="max-w-lg mx-auto px-6 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2 }}
           >
-            <div className="glass rounded-2xl p-5 space-y-4">
-              <IndexBar label="夜晚情绪" value={result.nightEmotion} color="#ef4444" />
-              <IndexBar label="关系依赖" value={result.relationDependency} color="#f59e0b" />
-              <IndexBar label="精神内耗" value={result.mentalFriction} color="#8b5cf6" />
-            </div>
-          </motion.section>
-
-          {/* ═══ VIRAL STATS ═══ */}
-          <motion.section
-            className="max-w-lg mx-auto px-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.3 }}
-          >
-            <div className="grid grid-cols-2 gap-3">
-              <div className="glass rounded-xl p-4 text-center">
-                <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">危险匹配</p>
-                <p className="text-sm text-red-400/80 font-medium">{personality.dangerMatch}</p>
-              </div>
-              <div className="glass rounded-xl p-4 text-center">
-                <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">崩溃时间</p>
-                <p className="text-xs text-amber-400/80 font-mono">{personality.collapseTime}</p>
-              </div>
-              <div className="glass rounded-xl p-4 text-center">
-                <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">攻击性</p>
-                <p className="text-sm text-dark-300 font-mono"><AnimatedNumber value={personality.attackIndex} />/10</p>
-              </div>
-              <div className="glass rounded-xl p-4 text-center">
-                <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">消失概率</p>
-                <p className="text-sm text-dark-300 font-mono"><AnimatedNumber value={personality.chatDisappear} suffix="%" /></p>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* ═══ BEHAVIOR LIST ═══ */}
-          <motion.section
-            className="max-w-lg mx-auto px-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5 }}
-          >
             <div className="glass rounded-2xl p-6">
               <p className="text-[10px] text-dark-700 tracking-wider uppercase mb-4">你的行为特征</p>
               <div className="space-y-3">
-                {personality.behavior.map((b, i) => (
+                {personality.behavior.slice(0, 3).map((b, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="text-dark-700 text-xs mt-0.5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
                     <p className="text-sm text-dark-300 leading-relaxed">{b}</p>
                   </div>
                 ))}
+                {/* 第4条：锁定状态 */}
+                {!unlocked && (
+                  <div className="flex items-start gap-3 relative">
+                    <span className="text-dark-700 text-xs mt-0.5 shrink-0">04</span>
+                    <div className="relative flex-1">
+                      <p className="text-sm text-dark-300 leading-relaxed blur-[6px] select-none">{personality.behavior[3]}</p>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[10px] text-dark-600 bg-dark-900/80 px-2 py-0.5 rounded">🔒 解锁后查看</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {unlocked && (
+                  <div className="flex items-start gap-3">
+                    <span className="text-dark-700 text-xs mt-0.5 shrink-0">04</span>
+                    <p className="text-sm text-dark-300 leading-relaxed">{personality.behavior[3]}</p>
+                  </div>
+                )}
               </div>
             </div>
           </motion.section>
 
-          {/* ═══ HIDDEN PERSONALITY ═══ */}
-          <motion.section
-            className="max-w-lg mx-auto px-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.7 }}
-          >
-            <div className="glass rounded-2xl p-6 border-dark-800/30">
-              <p className="text-[10px] text-dark-700 tracking-wider uppercase mb-2">隐藏人格</p>
-              <p className="text-lg font-bold text-dark-200 mb-3">{personality.hiddenPersonality.name}</p>
-              <p className="text-sm text-dark-400 leading-relaxed">{personality.hiddenPersonality.description}</p>
-            </div>
-          </motion.section>
-
-          {/* ═══ OTHER MATCHES ═══ */}
-          <motion.section
-            className="max-w-lg mx-auto px-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.9 }}
-          >
-            <div className="space-y-2">
-              {secondPersonality && (
-                <div className="glass rounded-xl p-4 flex items-center gap-4">
-                  <span className="text-xl">{secondPersonality.icon}</span>
-                  <div className="flex-1">
-                    <p className="text-[11px] text-dark-600">{result.secondMatchPercent}% 匹配</p>
-                    <p className="text-sm text-dark-300">{secondPersonality.name}</p>
-                  </div>
+          {/* ═══ 锁定内容预览 ═══ */}
+          {!unlocked && (
+            <motion.section
+              className="max-w-lg mx-auto px-6 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+            >
+              <div className="glass rounded-2xl p-6">
+                <p className="text-[10px] text-dark-700 tracking-wider uppercase mb-4">你未解锁的人格报告</p>
+                <div className="space-y-3">
+                  {lockedPreviews.map((item, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-3 ${i >= 6 ? "opacity-40" : ""}`}
+                    >
+                      <span className="text-sm">🔒</span>
+                      <p className="text-sm text-dark-400">{item}</p>
+                    </div>
+                  ))}
                 </div>
-              )}
-              {thirdPersonality && (
-                <div className="glass rounded-xl p-4 flex items-center gap-4 opacity-60">
-                  <span className="text-xl">{thirdPersonality.icon}</span>
-                  <div className="flex-1">
-                    <p className="text-[11px] text-dark-700">{result.thirdMatchPercent}% 匹配</p>
-                    <p className="text-sm text-dark-400">{thirdPersonality.name}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.section>
+              </div>
+            </motion.section>
+          )}
 
-          {/* ═══ SHARE ═══ */}
-          <motion.section
-            className="max-w-lg mx-auto px-6 mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.1 }}
-          >
-            <div className="glass rounded-2xl p-6 mb-6 text-center">
-              <p className="text-sm text-dark-300 leading-relaxed italic mb-3">
-                &ldquo;{personality.shareText}&rdquo;
+          {/* ═══ 解锁按钮 ═══ */}
+          {!unlocked && (
+            <motion.section
+              className="max-w-lg mx-auto px-6 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.6 }}
+            >
+              <p className="text-center text-sm text-dark-500 mb-4 leading-relaxed">
+                {report?.hook || "你的人格报告里，有一部分你应该不会愿意承认。"}
               </p>
-              <div className="pt-3 border-t border-dark-800/30">
-                <p className="text-[10px] text-dark-700">
-                  全国仅 <span className="text-dark-500 font-mono">{personality.rarity}%</span> 的人属于该人格
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
               <button
-                onClick={handleCopy}
-                className="flex-1 py-3.5 rounded-xl glass text-sm text-dark-300 hover:text-white transition-colors active:scale-[0.98]"
+                onClick={handleUnlock}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-cold-dim to-cold-blue text-white font-medium text-sm hover:opacity-90 transition-opacity active:scale-[0.98]"
               >
-                {copied ? "已复制 ✓" : "复制分享文案"}
+                解锁完整报告 ¥9.9
               </button>
-              <button
-                onClick={() => router.push("/")}
-                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-cold-dim to-cold-blue text-sm text-white/90 hover:opacity-90 transition-opacity active:scale-[0.98]"
-              >
-                再测一次
-              </button>
-            </div>
+              <p className="text-center text-[10px] text-dark-700 mt-3">
+                一次性付费 · 永久查看 · 不会自动扣费
+              </p>
+            </motion.section>
+          )}
 
-            <p className="text-center text-[11px] text-dark-800 mt-4">
-              你敢把结果发给朋友吗？
-            </p>
-          </motion.section>
+          {/* ═══ 付费内容 ═══ */}
+          <AnimatePresence>
+            {unlocked && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+              >
+                {/* ═══ THREE INDEXES ═══ */}
+                <motion.section
+                  className="max-w-lg mx-auto px-6 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="glass rounded-2xl p-5 space-y-4">
+                    <IndexBar label="夜晚情绪" value={result.nightEmotion} color="#ef4444" />
+                    <IndexBar label="关系依赖" value={result.relationDependency} color="#f59e0b" />
+                    <IndexBar label="精神内耗" value={result.mentalFriction} color="#8b5cf6" />
+                  </div>
+                </motion.section>
+
+                {/* ═══ VIRAL STATS ═══ */}
+                <motion.section
+                  className="max-w-lg mx-auto px-6 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="glass rounded-xl p-4 text-center">
+                      <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">危险匹配</p>
+                      <p className="text-sm text-red-400/80 font-medium">{personality.dangerMatch}</p>
+                    </div>
+                    <div className="glass rounded-xl p-4 text-center">
+                      <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">崩溃时间</p>
+                      <p className="text-xs text-amber-400/80 font-mono">{personality.collapseTime}</p>
+                    </div>
+                    <div className="glass rounded-xl p-4 text-center">
+                      <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">攻击性</p>
+                      <p className="text-sm text-dark-300 font-mono"><AnimatedNumber value={personality.attackIndex} />/10</p>
+                    </div>
+                    <div className="glass rounded-xl p-4 text-center">
+                      <p className="text-[9px] text-dark-700 tracking-wider uppercase mb-1">消失概率</p>
+                      <p className="text-sm text-dark-300 font-mono"><AnimatedNumber value={personality.chatDisappear} suffix="%" /></p>
+                    </div>
+                  </div>
+                </motion.section>
+
+                {/* ═══ HIDDEN PERSONALITY ═══ */}
+                <motion.section
+                  className="max-w-lg mx-auto px-6 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="glass rounded-2xl p-6 border-dark-800/30">
+                    <p className="text-[10px] text-dark-700 tracking-wider uppercase mb-2">隐藏人格</p>
+                    <p className="text-lg font-bold text-dark-200 mb-3">{personality.hiddenPersonality.name}</p>
+                    <p className="text-sm text-dark-400 leading-relaxed">{personality.hiddenPersonality.description}</p>
+                  </div>
+                </motion.section>
+
+                {/* ═══ OTHER MATCHES ═══ */}
+                <motion.section
+                  className="max-w-lg mx-auto px-6 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div className="space-y-2">
+                    {secondPersonality && (
+                      <div className="glass rounded-xl p-4 flex items-center gap-4">
+                        <span className="text-xl">{secondPersonality.icon}</span>
+                        <div className="flex-1">
+                          <p className="text-[11px] text-dark-600">{result.secondMatchPercent}% 匹配</p>
+                          <p className="text-sm text-dark-300">{secondPersonality.name}</p>
+                        </div>
+                      </div>
+                    )}
+                    {thirdPersonality && (
+                      <div className="glass rounded-xl p-4 flex items-center gap-4 opacity-60">
+                        <span className="text-xl">{thirdPersonality.icon}</span>
+                        <div className="flex-1">
+                          <p className="text-[11px] text-dark-700">{result.thirdMatchPercent}% 匹配</p>
+                          <p className="text-sm text-dark-400">{thirdPersonality.name}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.section>
+
+                {/* ═══ 付费报告内容 ═══ */}
+                {report && (
+                  <motion.section
+                    className="max-w-lg mx-auto px-6 mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <div className="space-y-6">
+                      {report.sections.map((section, si) => (
+                        <div key={si} className="glass rounded-2xl p-6">
+                          <p className="text-[10px] text-dark-700 tracking-wider uppercase mb-4">{section.title}</p>
+                          <div className="space-y-4">
+                            {section.items.map((item, ii) => (
+                              <p key={ii} className="text-sm text-dark-300 leading-relaxed">{item}</p>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.section>
+                )}
+
+                {/* ═══ SHARE ═══ */}
+                <motion.section
+                  className="max-w-lg mx-auto px-6 mt-12"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <div className="glass rounded-2xl p-6 mb-6 text-center">
+                    <p className="text-sm text-dark-300 leading-relaxed italic mb-3">
+                      &ldquo;{personality.shareText}&rdquo;
+                    </p>
+                    <div className="pt-3 border-t border-dark-800/30">
+                      <p className="text-[10px] text-dark-700">
+                        全国仅 <span className="text-dark-500 font-mono">{personality.rarity}%</span> 的人属于该人格
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCopy}
+                      className="flex-1 py-3.5 rounded-xl glass text-sm text-dark-300 hover:text-white transition-colors active:scale-[0.98]"
+                    >
+                      {copied ? "已复制 ✓" : "复制分享文案"}
+                    </button>
+                    <button
+                      onClick={() => router.push("/")}
+                      className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-cold-dim to-cold-blue text-sm text-white/90 hover:opacity-90 transition-opacity active:scale-[0.98]"
+                    >
+                      再测一次
+                    </button>
+                  </div>
+
+                  <p className="text-center text-[11px] text-dark-800 mt-4">
+                    你敢把结果发给朋友吗？
+                  </p>
+                </motion.section>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ═══ DISCLAIMER ═══ */}
           <motion.div
             className="max-w-lg mx-auto px-6 mt-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 2.5 }}
+            transition={{ delay: unlocked ? 1.0 : 2.5 }}
           >
             <p className="text-[10px] text-dark-800 text-center leading-relaxed">
               本测试仅供娱乐和自我探索，不构成任何医学诊断。
